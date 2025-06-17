@@ -52,6 +52,17 @@
   border: 1px solid #ccc;
 }
 
+.wrapper-dashboard-left-side-bottom h3,
+.due-amount h3,
+.admin-list h3{
+  font-size: 21px;
+}
+
+.due-amount-color{
+  background-color: #ff8b8b;
+  border:1px solid #333;
+}
+
 .dashboard-right-side {
   flex: 1 1 35%;
   display: flex;

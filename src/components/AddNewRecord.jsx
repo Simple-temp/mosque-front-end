@@ -1,168 +1,164 @@
 import React, { useState } from "react";
+import axios from "axios";
 import {
   Box,
   Grid,
   TextField,
+  Button,
+  Typography,
   Select,
   MenuItem,
-  InputLabel,
   FormControl,
-  Button,
 } from "@mui/material";
+import { ToastContainer, toast } from "react-toastify";
 
 const AddNewRecord = () => {
-  const [userType, setUserType] = useState("");
-  const [specialRole, setSpecialRole] = useState("");
-
   const greenOutline = {
     "& .MuiOutlinedInput-root": {
-      "& fieldset": {
-        borderColor: "#00c853",
-      },
-      "&:hover fieldset": {
-        borderColor: "#00c853",
-      },
-      "&.Mui-focused fieldset": {
-        borderColor: "#00c853",
-      },
+      "& fieldset": { borderColor: "#00c853" },
+      "&:hover fieldset": { borderColor: "#00c853" },
+      "&.Mui-focused fieldset": { borderColor: "#00c853" },
     },
   };
 
-  const renderCommonFields = () => (
-    <>
-      <Grid item xs={12} md={4}>
-        <TextField
-          label="Name"
-          variant="outlined"
-          fullWidth
-          sx={greenOutline}
-        />
-      </Grid>
-      <Grid item xs={12} md={4}>
-        <TextField
-          label="Address"
-          variant="outlined"
-          fullWidth
-          sx={greenOutline}
-        />
-      </Grid>
-      <Grid item xs={12} md={4}>
-        <TextField
-          label="Number"
-          variant="outlined"
-          fullWidth
-          sx={greenOutline}
-        />
-      </Grid>
-      <Grid item xs={12} md={4}>
-        <TextField
-          label="Amount"
-          variant="outlined"
-          fullWidth
-          sx={greenOutline}
-        />
-      </Grid>
-      <Grid item xs={12} md={4}>
-        <TextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          sx={greenOutline}
-        />
-      </Grid>
-    </>
-  );
+  // Normal User State
+  const [normalUser, setNormalUser] = useState({
+    name: "",
+    address: "",
+    number: "",
+    amount: "",
+    email: "",
+  });
 
+  // Special User State
+  const [specialUser, setSpecialUser] = useState({
+    name: "",
+    address: "",
+    number: "",
+    paidAmount: "",
+    email: "",
+    fixedAmount: "",
+    role: "",
+  });
+
+  const handleNormalChange = (field) => (e) => {
+    setNormalUser({ ...normalUser, [field]: e.target.value });
+  };
+
+  const handleSpecialChange = (field) => (e) => {
+    setSpecialUser({ ...specialUser, [field]: e.target.value });
+  };
+
+ const handleSubmitNormal = async () => {
+    try {
+      const res = await axios.post("http://localhost:3000/api/add-user", {
+        ...normalUser,
+        userType: "normal",
+      });
+      console.log(res.data)
+      toast.success("🎉 Normal user registered!");
+      setNormalUser({ name: "", address: "", number: "", amount: "", email: "" });
+    } catch (error) {
+      toast.error("🚫 Failed to register normal user!");
+      console.log(error)
+    }
+  };
+
+  const handleSubmitSpecial = async () => {
+    try {
+      const res = await axios.post("http://localhost:3000/api/add-user", {
+        ...specialUser,
+        userType: "special",
+      });
+      console.log(res.data)
+      toast.success("🎊 Special user registered!");
+      setSpecialUser({ name: "", address: "", number: "", paidAmount: "", email: "", fixedAmount: "", role: "" });
+    } catch (error) {
+      toast.error("❌ Failed to register special user!");
+       console.log(error)
+    }
+  };
   return (
-    <div>
-      <div className="add-new-record-container">
-        <h1 style={{ color: "#00c853", fontSize: "22px" }}>Add new record</h1>
-        <div className="inner-record-container">
-          <div className="record-form">
-            <Box sx={{ p: { xs: 2, md: 4 } }}>
-              <Grid container spacing={2}>
-                {/* User Type */}
-                <Grid item xs={12} md={4}>
-                  <FormControl fullWidth variant="outlined">
-                    <Select
-                      label="User Type"
-                      value={userType}
-                      onChange={(e) => {
-                        setUserType(e.target.value);
-                        setSpecialRole("");
-                      }}
-                      displayEmpty
-                    >
-                      <MenuItem value="" disabled>
-                        Please select a user type
-                      </MenuItem>
-                      <MenuItem value="normal">Normal User</MenuItem>
-                      <MenuItem value="special">Special User</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
+    <Box sx={{ p: 4 }}>
+      <ToastContainer position="top-right" autoClose={2000} />
+      {/* 🔹 Normal User Form */}
+      <Typography variant="h6" color="#00c853" gutterBottom>
+        Normal User Registration
+      </Typography>
+      <Grid container spacing={2}>
+        {["name", "address", "number", "amount", "email"].map((field) => (
+          <Grid item xs={12} md={4} key={field}>
+            <TextField
+              label={field.charAt(0).toUpperCase() + field.slice(1)}
+              value={normalUser[field]}
+              onChange={handleNormalChange(field)}
+              fullWidth
+              sx={greenOutline}
+            />
+          </Grid>
+        ))}
+      </Grid>
+      <Box sx={{ mt: 2 }}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={handleSubmitNormal}
+        >
+          Submit Normal User
+        </Button>
+      </Box>
 
-                {/* Normal User Fields */}
-                {userType === "normal" && renderCommonFields()}
+      <Box mt={6} />
 
-                {/* Special User Role + All Fields */}
-                {userType === "special" && (
-                  <>
-                    <Grid item xs={12} md={4}>
-                      <FormControl fullWidth variant="outlined">
-                        <Select
-                          label="Special User Role"
-                          value={specialRole}
-                          onChange={(e) => setSpecialRole(e.target.value)}
-                        >
-                          <MenuItem value="admin">Admin</MenuItem>
-                          <MenuItem value="vip">VIP</MenuItem>
-                          <MenuItem value="manager">Manager</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </Grid>
-
-                    {specialRole && (
-                      <>
-                        {renderCommonFields()}
-                        <Grid item xs={12} md={4}>
-                          <TextField
-                            label="Fix Amount"
-                            variant="outlined"
-                            fullWidth
-                            sx={greenOutline}
-                          />
-                        </Grid>
-                      </>
-                    )}
-                  </>
-                )}
-              </Grid>
-
-              {/* Submit Button */}
-              {(userType === "normal" ||
-                (userType === "special" && specialRole)) && (
-                <Box
-                  sx={{
-                    mt: 4,
-                    display: "flex",
-                    justifyContent: "center",
-                  }}
-                >
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    className="custom-submit-btn"
-                  >
-                    Submit
-                  </Button>
-                </Box>
-              )}
-            </Box>
-          </div>
-        </div>
-      </div>
-    </div>
+      {/* 🔸 Special User Form */}
+      <Typography variant="h6" color="#00c853" gutterBottom>
+        Special User Registration
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12} md={4}>
+          <FormControl fullWidth>
+            <Select
+              value={specialUser.role}
+              onChange={handleSpecialChange("role")}
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                Select Role
+              </MenuItem>
+              <MenuItem value="VIP">VIP</MenuItem>
+              <MenuItem value="Manager">Manager</MenuItem>
+              <MenuItem value="Other">Other</MenuItem>
+            </Select>
+          </FormControl>
+        </Grid>
+        {["name", "address", "number", "paidAmount", "email", "fixedAmount"].map(
+          (field) => (
+            <Grid item xs={12} md={4} key={field}>
+              <TextField
+                label={
+                  field === "fixedAmount"
+                    ? "Fixed Amount"
+                    : field.charAt(0).toUpperCase() + field.slice(1)
+                }
+                value={specialUser[field]}
+                onChange={handleSpecialChange(field)}
+                fullWidth
+                sx={greenOutline}
+              />
+            </Grid>
+          )
+        )}
+      </Grid>
+      <Box sx={{ mt: 2 }}>
+        <Button
+          variant="contained"
+          color="success"
+          onClick={handleSubmitSpecial}
+        >
+          Submit Special User
+        </Button>
+      </Box>
+    </Box>
   );
 };
 
