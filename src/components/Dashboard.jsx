@@ -95,9 +95,25 @@ const Dashboard = () => {
     setSelectedUser(null);
   };
 
+  const [admins, setAdmins] = useState([]);
+  const [selectedAdmin, setSelectedAdmin] = useState(null);
+
+  const fetchAdmins = async () => {
+    try {
+      const res = await axios.get("http://localhost:3000/api/fixed-users");
+      setAdmins(res.data);
+    } catch (err) {
+      console.error("Error fetching admins:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchAdmins();
+  }, []);
+
   return (
     <div className="dashboard-wrapper">
-            <ToastContainer position="top-right" autoClose={2000} />
+      <ToastContainer position="top-right" autoClose={2000} />
       <h1 className="dashboard-heading">Dashboard</h1>
       <div className="dashboard-container">
         {/* Left Side */}
@@ -111,7 +127,7 @@ const Dashboard = () => {
                   return total + (user.paidAmount || user.amount || 0);
                 }, 0),
               ],
-              ["Total Admin List", 50],
+              ["Total Collectors List", admins.length],
             ].map(([title, value], idx) => (
               <div key={idx} className="innter-dashboard-top-box">
                 <div className="dashboard-top-info">
@@ -278,7 +294,6 @@ const Dashboard = () => {
               </Button>
             </DialogActions>
           </Dialog>
-
         </div>
 
         {/* Right Side */}
@@ -317,10 +332,10 @@ const Dashboard = () => {
                 <table>
                   <thead>
                     <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Due Amount</th>
-                      <th>View</th>
+                      <th style={{textAlign:"center"}}>ID</th>
+                      <th style={{textAlign:"center"}}>Name</th>
+                      <th style={{textAlign:"center"}}>Due Amount</th>
+                      <th style={{textAlign:"center"}}>View</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -361,7 +376,7 @@ const Dashboard = () => {
                 >
                   {selectedUser && (
                     <>
-                      <h3 style={{fontSize:"21px"}}>User Details</h3>
+                      <h3 style={{ fontSize: "21px" }}>User Details</h3>
                       <p>
                         <strong>ID:</strong> {selectedUser._id}
                       </p>
@@ -385,17 +400,17 @@ const Dashboard = () => {
               </Modal>
             </div>
 
-            <div className="admin-list">
-              <h3>Admin List</h3>
+            {/* <div className="admin-list">
+              <h3>Collector List</h3>
               <div className="responsive-table">
                 <table>
                   <thead>
                     <tr>
                       <th>ID</th>
                       <th>Name</th>
-                      <th>Role</th>
-                      <th>Paid</th>
-                      <th>Fix Amount</th>
+                      <th>Number</th>
+                      <th>Email</th>
+                      <th>Address</th>
                       <th>View</th>
                     </tr>
                   </thead>
@@ -405,7 +420,7 @@ const Dashboard = () => {
                         <td>{id}</td>
                         <td>Admin {id}</td>
                         <td>Admin</td>
-                        <td>{id * 100}</td>
+                        <td>example@gmail.com</td>
                         <td>1000</td>
                         <td>
                           <button className="btn-view">View</button>
@@ -415,7 +430,87 @@ const Dashboard = () => {
                   </tbody>
                 </table>
               </div>
+            </div> */}
+
+            <div className="admin-list">
+              <h3>Total Collectors List: {admins.length}</h3>
+              <div className="responsive-table">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style={{textAlign:"center"}}>ID</th>
+                      <th style={{textAlign:"center"}}>Name</th>
+                      <th style={{textAlign:"center"}}>Number</th>
+                      <th style={{textAlign:"center"}}>Email</th>
+                      <th style={{textAlign:"center"}}>Address</th>
+                      <th style={{textAlign:"center"}}>View</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {admins.map((admin, idx) => (
+                      <tr key={admin._id}>
+                        <td>{idx + 1}</td>
+                        <td>{admin.name}</td>
+                        <td>{admin.number}</td>
+                        <td>{admin.email}</td>
+                        <td>{admin.address}</td>
+                        <td>
+                          <button
+                            className="btn-view"
+                            onClick={() => setSelectedAdmin(admin)}
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
+
+            <Modal
+              open={!!selectedAdmin}
+              onClose={() => setSelectedAdmin(null)}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  bgcolor: "white",
+                  p: 4,
+                  borderRadius: 2,
+                  boxShadow: 24,
+                  width: 320,
+                  textAlign: "left",
+                }}
+              >
+                {selectedAdmin && (
+                  <>
+                    <h3 style={{ fontSize: "20px", marginBottom: "12px" }}>
+                      Collector Details
+                    </h3>
+                    <p>
+                      <strong>ID:</strong> {selectedAdmin._id}
+                    </p>
+                    <p>
+                      <strong>Name:</strong> {selectedAdmin.name}
+                    </p>
+                    <p>
+                      <strong>Number:</strong> {selectedAdmin.number}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {selectedAdmin.email}
+                    </p>
+                    <p>
+                      <strong>Address:</strong> {selectedAdmin.address}
+                    </p>
+                  </>
+                )}
+              </Box>
+            </Modal>
           </div>
         </div>
       </div>

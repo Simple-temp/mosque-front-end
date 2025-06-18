@@ -1,51 +1,88 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
   Modal,
   Typography,
   TextField,
-  Select,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
   Paper,
-  InputLabel,
-  FormControl,
 } from "@mui/material";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 const FixedAmountPage = () => {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
     name: "",
     number: "",
-    role: "admin",
-    fixedAmount: "",
+    email: "",
+    address: "",
   });
+  const [users, setUsers] = useState([]);
+  const [editingId, setEditingId] = useState(null);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setForm({ name: "", number: "", role: "admin", fixedAmount: "" });
+    setForm({ name: "", number: "", email: "", address: "" });
+    setEditingId(null);
   };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const fetchUsers = async () => {
+    const res = await axios.get("http://localhost:3000/api/fixed-users");
+    setUsers(res.data);
+  };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitted Fixed Amount User:", form);
-    handleClose();
+    try {
+      if (editingId) {
+        await axios.put(
+          `http://localhost:3000/api/fixed-users/${editingId}`,
+          form
+        );
+        toast.success("User Updated");
+      } else {
+        await axios.post("http://localhost:3000/api/fixed-users", form);
+        toast.success("User Addedd");
+      }
+      fetchUsers();
+      handleClose();
+    } catch (err) {
+      console.error("Error submitting user", err);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    await axios.delete(`http://localhost:3000/api/fixed-users/${id}`);
+    fetchUsers();
+    toast.success("Delete user!");
+  };
+
+  const handleEdit = (user) => {
+    setForm(user);
+    setEditingId(user._id);
+    setOpen(true);
   };
 
   return (
     <Box sx={{ padding: 4 }}>
+      <ToastContainer position="top-right" autoClose={2000} />
       <Typography variant="h5" sx={{ color: "#00c853", marginBottom: 2 }}>
-        Fixed Amount Page
+        Fixed User Page
       </Typography>
 
       <Box className="inner-fixed-user-box" sx={{ marginBottom: 2 }}>
@@ -64,20 +101,30 @@ const FixedAmountPage = () => {
                 <TableCell>ID</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Number</TableCell>
-                <TableCell sx={{ backgroundColor: "#fff9c4" }}>Fixed Amount</TableCell>
-                <TableCell sx={{ backgroundColor: "#c8e6c9" }}>Paid Amount</TableCell>
-                <TableCell sx={{ backgroundColor: "#ffcdd2" }}>Delete</TableCell>
-                <TableCell sx={{ backgroundColor: "#bbdefb" }}>Update</TableCell>
+                <TableCell sx={{ backgroundColor: "#fff9c4" }}>Email</TableCell>
+                <TableCell sx={{ backgroundColor: "#c8e6c9" }}>
+                  Address
+                </TableCell>
+                <TableCell sx={{ backgroundColor: "#ffcdd2" }}>
+                  Delete
+                </TableCell>
+                <TableCell sx={{ backgroundColor: "#bbdefb" }}>
+                  Update
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {[1, 2, 3, 4, 5].map((id) => (
-                <TableRow key={id}>
-                  <TableCell>{id}</TableCell>
-                  <TableCell>User {id}</TableCell>
-                  <TableCell>017000000{id}</TableCell>
-                  <TableCell sx={{ backgroundColor: "#fffde7" }}>${id * 100}</TableCell>
-                  <TableCell sx={{ backgroundColor: "#e8f5e9" }}>${id * 80}</TableCell>
+              {users.map((user, index) => (
+                <TableRow key={user._id}>
+                  <TableCell>{index + 1}</TableCell>
+                  <TableCell>{user.name}</TableCell>
+                  <TableCell>{user.number}</TableCell>
+                  <TableCell sx={{ backgroundColor: "#fffde7" }}>
+                    {user.email}
+                  </TableCell>
+                  <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
+                    {user.address}
+                  </TableCell>
                   <TableCell>
                     <Button
                       size="small"
@@ -86,6 +133,7 @@ const FixedAmountPage = () => {
                         color: "white",
                         ":hover": { backgroundColor: "#b71c1c" },
                       }}
+                      onClick={() => handleDelete(user._id)}
                     >
                       Delete
                     </Button>
@@ -98,6 +146,7 @@ const FixedAmountPage = () => {
                         color: "white",
                         ":hover": { backgroundColor: "#1e88e5" },
                       }}
+                      onClick={() => handleEdit(user)}
                     >
                       Update
                     </Button>
@@ -109,7 +158,7 @@ const FixedAmountPage = () => {
         </Paper>
       </Box>
 
-      {/* Material UI Modal */}
+      {/* Modal */}
       <Modal open={open} onClose={handleClose}>
         <Box
           sx={{
@@ -125,8 +174,9 @@ const FixedAmountPage = () => {
           }}
         >
           <Typography variant="h6" sx={{ color: "#00c853", mb: 2 }}>
-            Add Fixed Amount User
+            {editingId ? "Update Fixed Amount User" : "Add Fixed Amount User"}
           </Typography>
+
           <form onSubmit={handleSubmit}>
             <TextField
               label="Name"
@@ -146,34 +196,49 @@ const FixedAmountPage = () => {
               margin="normal"
               required
             />
-            <FormControl fullWidth margin="normal">
-              <Select
-                labelId="role-label"
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                required
-              >
-                <MenuItem value="admin">Admin</MenuItem>
-                <MenuItem value="VIP">VIP</MenuItem>
-                <MenuItem value="manager">Manager</MenuItem>
-              </Select>
-            </FormControl>
             <TextField
-              label="Fixed Amount"
-              name="fixedAmount"
+              label="Email"
+              name="email"
               fullWidth
-              value={form.fixedAmount}
+              value={form.email}
+              onChange={handleChange}
+              margin="normal"
+              type="email"
+              required
+            />
+            <TextField
+              label="Address"
+              name="address"
+              fullWidth
+              value={form.address}
               onChange={handleChange}
               margin="normal"
               required
-              type="number"
             />
-            <Box sx={{ mt: 2, display: "flex", justifyContent: "space-between" }}>
-              <Button type="submit" variant="contained" sx={{ backgroundColor: "#00c853" }}>
-                Submit
+            <Box
+              sx={{
+                mt: 3,
+                display: "flex",
+                justifyContent: "space-between",
+              }}
+            >
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{
+                  backgroundColor: "#00c853",
+                  ":hover": { backgroundColor: "#00b341" },
+                  width: "48%",
+                }}
+              >
+                {editingId ? "Update" : "Submit"}
               </Button>
-              <Button onClick={handleClose} variant="outlined" color="error">
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleClose}
+                sx={{ width: "48%" }}
+              >
                 Cancel
               </Button>
             </Box>
