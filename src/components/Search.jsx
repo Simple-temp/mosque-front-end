@@ -115,11 +115,11 @@ const Search = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [addedAmount, setAddedAmount] = useState("");
 
-  const handleOpenDialog = (user) => {
-    setSelectedUser(user);
-    setAddedAmount("");
-    setOpenDialog(true);
-  };
+  // const handleOpenDialog = (user) => {
+  //   setSelectedUser(user);
+  //   setAddedAmount("");
+  //   setOpenDialog(true);
+  // };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -239,10 +239,10 @@ const Search = () => {
                     <th>Email</th>
                     <th>Number</th>
                     <th>Address</th>
-                    <th>Fix Amount</th>
-                    <th>Due Amount</th>
+                    <th>Fix Amount</th>                
                     <th>Paid</th>
-                    <th>Add</th>
+                    <th>Due Amount</th>
+                    {/* <th>Add</th> */}
                     <th>Role</th>
                     <th>Delete</th>
                     {/* <th>Update</th> */}
@@ -258,22 +258,23 @@ const Search = () => {
                       <td>{user?.number}</td>
                       <td>{user?.address}</td>
                       <td className="fix">{user?.fixedAmount || "-"}</td>
-                      <td className="due">
+
+                      <td className="paid">
+                        {user?.paidAmount || user?.amount}
+                      </td>
+                                            <td className="due">
                         {user?.fixedAmount
                           ? user?.fixedAmount - user?.paidAmount
                           : "-"}
                       </td>
-                      <td className="paid">
-                        {user?.paidAmount || user?.amount}
-                      </td>
-                      <td className="add-money">
+                      {/* <td className="add-money">
                         <button
                           className="add-money"
                           onClick={() => handleOpenDialog(user)}
                         >
                           <AddIcon />
                         </button>
-                      </td>
+                      </td> */}
                       <td>{user?.role || "General"}</td>
                       <td>
                         <button

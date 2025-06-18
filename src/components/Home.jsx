@@ -38,6 +38,11 @@ const Home = () => {
               <YoutubeSearchedForIcon /> Search
             </Link>
           </li>
+                    <li>
+            <Link to="individualsearch" onClick={() => setSidebarOpen(false)}>
+              <YoutubeSearchedForIcon /> Individual Search
+            </Link>
+          </li>
           <li>
             <Link to="adminlist" onClick={() => setSidebarOpen(false)}>
               <AdminPanelSettingsIcon /> Admin List
@@ -45,7 +50,7 @@ const Home = () => {
           </li>
           <li>
             <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
-              <AssignmentIndIcon /> Fixed Amount User
+              <AssignmentIndIcon /> Fixed Collectors User
             </Link>
           </li>
           <li>
