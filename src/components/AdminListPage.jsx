@@ -24,6 +24,8 @@ const AdminListPage = () => {
     number: "",
     address: "",
     role: "admin",
+    password: "",
+    retypePassword: "",
     email: "",
   });
   const [currentId, setCurrentId] = useState(null);
@@ -38,29 +40,54 @@ const AdminListPage = () => {
   }, []);
 
   const handleChange = (e) => {
-    setAdminData({ ...adminData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setAdminData({ ...adminData, [name]: value });
   };
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    await axios.post("http://localhost:3000/api/admin/create", adminData);
-    fetchAdmins();
-    handleClose();
-    toast.success("User Addedd");
+    if (adminData.password !== adminData.retypePassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    const { retypePassword, ...dataToSend } = adminData;
+
+    try {
+      await axios.post("http://localhost:3000/api/admin/create", dataToSend);
+      fetchAdmins();
+      handleClose();
+      toast.success("User Added");
+    } catch (err) {
+      toast.error("Failed to create user");
+    }
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    await axios.put(`http://localhost:3000/api/admin/${currentId}`, adminData);
-    fetchAdmins();
-    handleClose();
-    toast.success("User Updated");
+    const { retypePassword, ...dataToSend } = adminData;
+
+    try {
+      await axios.put(
+        `http://localhost:3000/api/admin/${currentId}`,
+        dataToSend
+      );
+      fetchAdmins();
+      handleClose();
+      toast.success("User Updated");
+    } catch (err) {
+      toast.error("Failed to update user");
+    }
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:3000/api/admin/${id}`);
-    fetchAdmins();
-    toast.success("Delete user!");
+    try {
+      await axios.delete(`http://localhost:3000/api/admin/${id}`);
+      fetchAdmins();
+      toast.success("User Deleted");
+    } catch (err) {
+      toast.error("Failed to delete user");
+    }
   };
 
   const handleOpenCreate = () => {
@@ -69,13 +96,15 @@ const AdminListPage = () => {
       number: "",
       address: "",
       role: "admin",
+      password: "",
+      retypePassword: "",
       email: "",
     });
     setOpenCreate(true);
   };
 
   const handleOpenUpdate = (admin) => {
-    setAdminData(admin);
+    setAdminData({ ...admin, password: "", retypePassword: "" });
     setCurrentId(admin._id);
     setOpenUpdate(true);
   };
@@ -203,23 +232,40 @@ const AdminListPage = () => {
               required
             />
             <TextField
-              label="Role"
-              name="role"
-              fullWidth
-              value={adminData.role}
-              onChange={handleChange}
-              margin="normal"
-              required
-            />
-            <TextField
               label="Email"
               name="email"
+              type="email"
               fullWidth
               value={adminData.email}
               onChange={handleChange}
               margin="normal"
               required
             />
+
+            {openCreate && (
+              <>
+                <TextField
+                  label="Password"
+                  name="password"
+                  type="password"
+                  fullWidth
+                  value={adminData.password}
+                  onChange={handleChange}
+                  margin="normal"
+                  required
+                />
+                <TextField
+                  label="Re-type Password"
+                  name="retypePassword"
+                  type="password"
+                  fullWidth
+                  value={adminData.retypePassword}
+                  onChange={handleChange}
+                  margin="normal"
+                  required
+                />
+              </>
+            )}
 
             <Box
               sx={{ mt: 3, display: "flex", justifyContent: "space-between" }}

@@ -25,6 +25,7 @@ const FixedAmountPage = () => {
   });
   const [users, setUsers] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [collections, SetCollections] = useState([]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -39,7 +40,37 @@ const FixedAmountPage = () => {
 
   const fetchUsers = async () => {
     const res = await axios.get("http://localhost:3000/api/fixed-users");
-    setUsers(res.data);
+    const fixedUsers = res.data;
+
+    const collectionRes = await axios.get("http://localhost:3000/api/users");
+    const collections = collectionRes.data;
+
+    // Create a new list with totalCollection calculated
+    const updatedUsers = fixedUsers.map((user) => {
+      const matchedData = collections.filter(
+        (item) => String(item.number).trim() === String(user.number).trim()
+      );
+
+      console.log(matchedData);
+
+      let total = 0;
+
+      matchedData.forEach((entry) => {
+        if (entry.userType === "normal" && entry.amount) {
+          total += Number(entry.amount);
+        }
+        if (entry.userType === "special" && entry.paidAmount) {
+          total += Number(entry.paidAmount);
+        }
+      });
+
+      return {
+        ...user,
+        totalCollection: total,
+      };
+    });
+
+    setUsers(updatedUsers);
   };
 
   useEffect(() => {
@@ -105,6 +136,9 @@ const FixedAmountPage = () => {
                 <TableCell sx={{ backgroundColor: "#c8e6c9" }}>
                   Address
                 </TableCell>
+                <TableCell sx={{ backgroundColor: "#fff9c4" }}>
+                  Total Collection
+                </TableCell>
                 <TableCell sx={{ backgroundColor: "#ffcdd2" }}>
                   Delete
                 </TableCell>
@@ -124,6 +158,9 @@ const FixedAmountPage = () => {
                   </TableCell>
                   <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
                     {user.address}
+                  </TableCell>
+                  <TableCell sx={{ backgroundColor: "#fff9c4" }}>
+                    {user.totalCollection}
                   </TableCell>
                   <TableCell>
                     <Button

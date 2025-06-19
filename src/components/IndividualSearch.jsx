@@ -71,6 +71,60 @@ const IndividualSearch = () => {
     setAddedAmount("");
   };
 
+  // const handleConfirmAdd = async () => {
+  //   let amountLeft = Number(addedAmount);
+  //   if (isNaN(amountLeft) || amountLeft <= 0) {
+  //     toast.error("Please enter a valid amount");
+  //     return;
+  //   }
+
+  //   const updatedUsers = [...filteredUsers];
+  //   let anyUpdate = false;
+
+  //   for (let user of updatedUsers) {
+  //     const due =
+  //       (user.fixedAmount || 0) - (user.paidAmount || user.amount || 0);
+  //     if (due <= 0) continue;
+
+  //     const deduct = Math.min(due, amountLeft);
+  //     const newPaid = (user.paidAmount || user.amount || 0) + deduct;
+
+  //     try {
+  //       await axios.put(`http://localhost:3000/api/users/${user._id}`, {
+  //         [user.userType === "special" ? "paidAmount" : "amount"]: newPaid,
+  //       });
+
+  //       setUsers((prev) =>
+  //         prev.map((u) =>
+  //           u._id === user._id
+  //             ? {
+  //                 ...u,
+  //                 [user.userType === "special" ? "paidAmount" : "amount"]:
+  //                   newPaid,
+  //               }
+  //             : u
+  //         )
+  //       );
+
+  //       amountLeft -= deduct;
+  //       anyUpdate = true;
+  //       if (amountLeft <= 0) break;
+  //     } catch (error) {
+  //       console.error("Add money error:", error);
+  //       toast.error("Error updating user amount");
+  //     }
+  //   }
+
+  //   if (anyUpdate) {
+  //     toast.success("Amount successfully distributed. Please search again.");
+  //   } else {
+  //     toast.info("No due found to add money.");
+  //   }
+
+  //   await fetchUsers();
+  //   handleCloseDialog();
+  // };
+
   const handleConfirmAdd = async () => {
     let amountLeft = Number(addedAmount);
     if (isNaN(amountLeft) || amountLeft <= 0) {
@@ -116,7 +170,8 @@ const IndividualSearch = () => {
     }
 
     if (anyUpdate) {
-      toast.success("Amount successfully distributed. Please search again.");
+      toast.success("Amount successfully addedd. wait 15s.");
+      startCooldown(); // ⏱️ Start timer
     } else {
       toast.info("No due found to add money.");
     }
@@ -143,6 +198,21 @@ const IndividualSearch = () => {
     const due = (user.fixedAmount || 0) - (user.paidAmount || user.amount || 0);
     return sum + (due > 0 ? due : 0);
   }, 0);
+
+  const [cooldownTimer, setCooldownTimer] = useState(0);
+
+  const startCooldown = () => {
+    setCooldownTimer(15); // 15 seconds
+    const interval = setInterval(() => {
+      setCooldownTimer((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
 
   return (
     <div>
@@ -214,8 +284,22 @@ const IndividualSearch = () => {
                   <td colSpan="8">Total Due:</td>
                   <td style={{ color: "red" }}>{totalDue}</td>
                   <td>
-                    <button onClick={handleOpenDialog}>
+                    <button
+                      onClick={handleOpenDialog}
+                      disabled={cooldownTimer > 0}
+                    >
                       <AddIcon />
+                      {cooldownTimer > 0 && (
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            marginLeft: "5px",
+                            color: "red",
+                          }}
+                        >
+                          {cooldownTimer}s
+                        </span>
+                      )}
                     </button>
                   </td>
                   <td colSpan="2"></td>

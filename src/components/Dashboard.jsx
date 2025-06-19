@@ -144,16 +144,16 @@ const Dashboard = () => {
               <table>
                 <thead>
                   <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Number</th>
-                    <th>Address</th>
-                    <th>FixedAmount</th>
-                    <th>Paid</th>
-                    <th>Due</th>
-                    <th>Role</th>
-                    <th>Delete</th>
-                    <th>Update</th>
+                    <th style={{textAlign:"center"}}>ID</th>
+                    <th style={{textAlign:"center"}}>Name</th>
+                    <th style={{textAlign:"center"}}>Number</th>
+                    <th style={{textAlign:"center"}}>Address</th>
+                    <th style={{textAlign:"center"}}>FixedAmount</th>
+                    <th style={{textAlign:"center"}}>Paid</th>
+                    <th style={{textAlign:"center"}}>Due</th>
+                    <th style={{textAlign:"center"}}>Role</th>
+                    <th style={{textAlign:"center"}}>Delete</th>
+                    <th style={{textAlign:"center"}}>Update</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -299,33 +299,6 @@ const Dashboard = () => {
         {/* Right Side */}
         <div className="dashboard-right-side">
           <div className="wrapper-dashboard-right">
-            {/* <div className="due-amount">
-              <h3>Due Amount User List</h3>
-              <div className="responsive-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Due Amount</th>
-                      <th>View</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[1, 2, 3].map((id) => (
-                      <tr key={id}>
-                        <td>{id}</td>
-                        <td>Client {id}</td>
-                        <td>{1000 - id * 100}</td>
-                        <td>
-                          <button className="btn-view">View</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div> */}
             <div className="due-amount">
               <h3>Due Amount User List</h3>
               <div className="responsive-table">

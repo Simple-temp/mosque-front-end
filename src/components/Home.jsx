@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import YoutubeSearchedForIcon from "@mui/icons-material/YoutubeSearchedFor";
@@ -10,10 +10,26 @@ import LogoutIcon from "@mui/icons-material/Logout";
 
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("adminUser"));
+    if (user?.role === "admin") {
+      setIsAdmin(true);
+    } else {
+      setIsAdmin(false);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    navigate("/");
+  };
 
   return (
     <div className="home-container">
-      {/* Hamburger for small screen */}
       <button
         className="hamburger"
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -38,19 +54,9 @@ const Home = () => {
               <YoutubeSearchedForIcon /> Search
             </Link>
           </li>
-                    <li>
+          <li>
             <Link to="individualsearch" onClick={() => setSidebarOpen(false)}>
               <YoutubeSearchedForIcon /> Individual Search
-            </Link>
-          </li>
-          <li>
-            <Link to="adminlist" onClick={() => setSidebarOpen(false)}>
-              <AdminPanelSettingsIcon /> Admin List
-            </Link>
-          </li>
-          <li>
-            <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
-              <AssignmentIndIcon /> Fixed Collectors User
             </Link>
           </li>
           <li>
@@ -58,13 +64,27 @@ const Home = () => {
               <GroupRemoveIcon /> Due Amount
             </Link>
           </li>
-          <li
-            style={{ cursor: "pointer" }}
-            onClick={() => setSidebarOpen(false)}
-          >
-            <Link to="/" onClick={() => setSidebarOpen(false)}>
-              <LogoutIcon /> Logout
+
+          <li>
+            <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
+              <AssignmentIndIcon /> Fixed User
             </Link>
+          </li>
+
+          {isAdmin && (
+            <>
+              <li>
+                <Link to="adminlist" onClick={() => setSidebarOpen(false)}>
+                  <AdminPanelSettingsIcon /> Admin List
+                </Link>
+              </li>
+            </>
+          )}
+
+          <li style={{ cursor: "pointer" }}>
+            <span onClick={handleLogout}>
+              <LogoutIcon /> Logout
+            </span>
           </li>
         </ul>
       </div>

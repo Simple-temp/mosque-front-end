@@ -11,23 +11,32 @@ import FixedAmountPage from "./components/FixedAmountPage";
 import Home from "./components/Home";
 import Dashboard from "./components/Dashboard";
 import IndividualSearch from "./components/IndividualSearch";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <>
       <div>
         <Routes>
+          {/* Public Route */}
           <Route path="/" element={<LoginPage />} />
-          <Route path="/dashboard" element={<Home />}>
-            <Route path="addnewrecord" element={<AddNewRecord />} />
-            <Route path="search" element={<Search />} />
-            <Route path="individualsearch" element={<IndividualSearch />} />
-            <Route path="adminlist" element={<AdminListPage />} />
-            <Route path="fixedamout" element={<FixedAmountPage />} />
-            <Route path="dashboardoverview" element={<Dashboard />} />
-            <Route path="dueamount" element={<DuePage />} />
+
+          {/* Protected Routes */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/dashboard" element={<Home />}>
+              <Route path="addnewrecord" element={<AddNewRecord />} />
+              <Route path="search" element={<Search />} />
+              <Route path="individualsearch" element={<IndividualSearch />} />
+              <Route path="adminlist" element={<AdminListPage />} />
+              <Route path="fixedamout" element={<FixedAmountPage />} />
+              <Route path="dashboardoverview" element={<Dashboard />} />
+              <Route path="dueamount" element={<DuePage />} />
+            </Route>
+
+            <Route path="/trashfile" element={<TrashFile />} />
           </Route>
-          <Route path="/trashfile" element={<TrashFile />} />
+
+          {/* 404 fallback */}
           <Route path="/*" element={<NotFound />} />
         </Routes>
       </div>
