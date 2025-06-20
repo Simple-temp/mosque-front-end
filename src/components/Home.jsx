@@ -7,6 +7,8 @@ import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import GroupRemoveIcon from "@mui/icons-material/GroupRemove";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
 
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -39,6 +41,16 @@ const Home = () => {
 
       <div className={`left-part ${sidebarOpen ? "open" : ""}`}>
         <ul className="sidebar-menu">
+          <li>
+            <Link to="myaccount" onClick={() => setSidebarOpen(false)}>
+              <AccountCircleIcon /> My Account
+            </Link>
+          </li>
+          <li>
+            <Link to="mycollection" onClick={() => setSidebarOpen(false)}>
+              <WorkHistoryIcon /> My Collection
+            </Link>
+          </li>
           <li>
             <Link to="dashboardoverview" onClick={() => setSidebarOpen(false)}>
               <DashboardIcon /> Dashboard

@@ -1,18 +1,17 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Typography,
   Table,
   TableBody,
   TableCell,
+  TableContainer,
   TableHead,
   TableRow,
   Paper,
   Button,
 } from "@mui/material";
-import axios from "axios";
-import { useState } from "react";
-import { useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 const DuePage = () => {
@@ -23,7 +22,6 @@ const DuePage = () => {
       try {
         const res = await axios.get("http://localhost:3000/api/due");
         setUsers(res.data);
-        console.log(res.data);
       } catch (err) {
         console.error("Error fetching due users:", err);
       }
@@ -38,8 +36,6 @@ const DuePage = () => {
     try {
       await axios.delete(`http://localhost:3000/api/due/${id}`);
       toast.success("User deleted successfully");
-
-      // Refresh list
       setUsers((prev) => prev.filter((u) => u._id !== id));
     } catch (error) {
       toast.error("Error deleting user");
@@ -61,6 +57,7 @@ const DuePage = () => {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Name</TableCell>
+              <TableCell>Role</TableCell>
               <TableCell>Number</TableCell>
               <TableCell sx={{ backgroundColor: "#c8e6c9" }}>
                 Paid Amount
@@ -75,56 +72,61 @@ const DuePage = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {users.map((user, index) => {
-              const dueAmount =
-                user.userType === "special"
-                  ? Number(user.fixedAmount) - Number(user.paidAmount)
-                  : 0;
-              const isDue = user.userType === "special" && dueAmount > 0;
+            {users
+              .filter(
+                (user) =>
+                  user.userType === "special" &&
+                  Number(user.fixedAmount) > Number(user.paidAmount)
+              )
+              .map((user, index) => {
+                const dueAmount =
+                  Number(user.fixedAmount) - Number(user.paidAmount);
 
-              return (
-                <TableRow key={user._id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{user.name}</TableCell>
-                  <TableCell>{user.number}</TableCell>
-                  <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
-                    {user.paidAmount || 0}
-                  </TableCell>
-                  <TableCell sx={{ backgroundColor: "#ffebee" }}>
-                    {dueAmount}
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        backgroundColor: "#64b5f6",
-                        color: "white",
-                        ":hover": { backgroundColor: "#42a5f5" },
-                      }}
-                      disabled={!isDue}
-                      onClick={() => alert(`Message sent to ${user.number}`)}
-                    >
-                      Send
-                    </Button>
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{
-                        backgroundColor: "#e53935",
-                        color: "white",
-                        ":hover": { backgroundColor: "#c62828" },
-                      }}
-                      onClick={() => handleDelete(user._id)}
-                    >
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                return (
+                  <TableRow key={user._id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{user.name}</TableCell>
+                    <TableCell>{user.role}</TableCell>
+                    <TableCell>{user.number}</TableCell>
+                    <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
+                      {user.paidAmount || 0}
+                    </TableCell>
+                    <TableCell sx={{ backgroundColor: "#ffebee" }}>
+                      {dueAmount}
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: "#64b5f6",
+                          color: "white",
+                          ":hover": { backgroundColor: "#42a5f5" },
+                        }}
+                        onClick={() =>
+                          alert(`Message sent to ${user.number}`)
+                        }
+                      >
+                        Send
+                      </Button>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{
+                          backgroundColor: "#e53935",
+                          color: "white",
+                          ":hover": { backgroundColor: "#c62828" },
+                        }}
+                        onClick={() => handleDelete(user._id)}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
           </TableBody>
         </Table>
       </Paper>
