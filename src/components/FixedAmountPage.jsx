@@ -21,16 +21,27 @@ const FixedAmountPage = () => {
     name: "",
     number: "",
     email: "",
+    role: "fixed",
     address: "",
+    password: "",
+    retypePassword: "",
   });
+
   const [users, setUsers] = useState([]);
   const [editingId, setEditingId] = useState(null);
-  const [collections, SetCollections] = useState([]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setForm({ name: "", number: "", email: "", address: "" });
+    setForm({
+      name: "",
+      number: "",
+      email: "",
+      address: "",
+      password: "",
+      retypePassword: "",
+      role: "fixed",
+    });
     setEditingId(null);
   };
 
@@ -38,40 +49,63 @@ const FixedAmountPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const fetchUsers = async () => {
+const fetchUsers = async () => {
+  try {
+    const userData = JSON.parse(localStorage.getItem("adminUser")); // Contains _id and role
+    const loggedInUserId = userData?._id;
+    const userRole = userData?.role;
+
     const res = await axios.get("http://localhost:3000/api/fixed-users");
     const fixedUsers = res.data;
 
     const collectionRes = await axios.get("http://localhost:3000/api/users");
     const collections = collectionRes.data;
 
-    // Create a new list with totalCollection calculated
+    // Step 1: Filter collections submitted by the logged-in user
+    const userCollections = collections.filter((item) => {
+      if (userRole === "admin") {
+        return item.submittedByAdmin === loggedInUserId;
+      } else if (userRole === "fixed") {
+        return item.submittedByFixedUser === loggedInUserId;
+      }
+      return false;
+    });
+
+    let total = 0;
+    let totalNormal = 0;
+    let totalSpecial = 0;
+
+    userCollections.forEach((entry) => {
+      if (entry.userType === "normal" && entry.amount) {
+        total += Number(entry.amount);
+        totalNormal += Number(entry.amount);
+      } else if (entry.userType === "special" && entry.paidAmount) {
+        total += Number(entry.paidAmount);
+        totalSpecial += Number(entry.paidAmount);
+      }
+    });
+
+    const collectionCount = userCollections.length;
+
+    // ✅ Add actualAmount = fixedAmount - paidAmount for each special user
     const updatedUsers = fixedUsers.map((user) => {
-      const matchedData = collections.filter(
-        (item) => String(item.number).trim() === String(user.number).trim()
-      );
-
-      console.log(matchedData);
-
-      let total = 0;
-
-      matchedData.forEach((entry) => {
-        if (entry.userType === "normal" && entry.amount) {
-          total += Number(entry.amount);
-        }
-        if (entry.userType === "special" && entry.paidAmount) {
-          total += Number(entry.paidAmount);
-        }
-      });
+      const fixed = Number(user.fixedAmount) || 0;
+      const paid = Number(user.paidAmount) || 0;
 
       return {
         ...user,
         totalCollection: total,
+        collectionCount: collectionCount,
+        actualAmount: fixed - paid,
       };
     });
 
     setUsers(updatedUsers);
-  };
+  } catch (error) {
+    console.error("Error fetching users:", error);
+  }
+};
+
 
   useEffect(() => {
     fetchUsers();
@@ -79,21 +113,32 @@ const FixedAmountPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!editingId && form.password !== form.retypePassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
     try {
+      const payload = { ...form };
+      delete payload.retypePassword;
+
       if (editingId) {
         await axios.put(
           `http://localhost:3000/api/fixed-users/${editingId}`,
-          form
+          payload
         );
         toast.success("User Updated");
       } else {
-        await axios.post("http://localhost:3000/api/fixed-users", form);
-        toast.success("User Addedd");
+        await axios.post("http://localhost:3000/api/fixed-users", payload);
+        toast.success("User Added");
       }
+
       fetchUsers();
       handleClose();
     } catch (err) {
       console.error("Error submitting user", err);
+      toast.error("Failed to submit user");
     }
   };
 
@@ -136,9 +181,10 @@ const FixedAmountPage = () => {
                 <TableCell sx={{ backgroundColor: "#c8e6c9" }}>
                   Address
                 </TableCell>
-                <TableCell sx={{ backgroundColor: "#fff9c4" }}>
+                <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
                   Total Collection
                 </TableCell>
+                <TableCell sx={{ backgroundColor: "#fff9c4" }}>Count</TableCell>
                 <TableCell sx={{ backgroundColor: "#ffcdd2" }}>
                   Delete
                 </TableCell>
@@ -161,6 +207,9 @@ const FixedAmountPage = () => {
                   </TableCell>
                   <TableCell sx={{ backgroundColor: "#fff9c4" }}>
                     {user.totalCollection}
+                  </TableCell>
+                  <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
+                    {user.collectionCount}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -252,6 +301,31 @@ const FixedAmountPage = () => {
               margin="normal"
               required
             />
+            {!editingId && (
+              <>
+                <TextField
+                  label="Password"
+                  name="password"
+                  fullWidth
+                  type="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  margin="normal"
+                  required
+                />
+                <TextField
+                  label="Re-type Password"
+                  name="retypePassword"
+                  fullWidth
+                  type="password"
+                  value={form.retypePassword}
+                  onChange={handleChange}
+                  margin="normal"
+                  required
+                />
+              </>
+            )}
+
             <Box
               sx={{
                 mt: 3,

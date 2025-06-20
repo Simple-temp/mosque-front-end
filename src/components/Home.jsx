@@ -67,7 +67,7 @@ const Home = () => {
 
           <li>
             <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
-              <AssignmentIndIcon /> Fixed User
+              <AssignmentIndIcon /> Collectors
             </Link>
           </li>
 

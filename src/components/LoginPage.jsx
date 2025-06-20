@@ -17,43 +17,46 @@ const LoginPage = () => {
     }
 
     try {
-      // 🔹 Step 1: Try admin login
-      const res = await axios.post("http://localhost:3000/api/admin/login", {
+      // ✅ Step 1: Try Fixed User Login
+      const fixedUserRes = await axios.post("http://localhost:3000/api/fixed-users/login", {
         number,
         password,
       });
 
-      const { user, token } = res.data;
+      const fixedUser = fixedUserRes.data.user;
+      const fixedToken = fixedUserRes.data.token;
 
-      localStorage.setItem("adminUser", JSON.stringify(user));
-      localStorage.setItem("adminToken", token);
+      localStorage.setItem("adminUser", JSON.stringify(fixedUser));
+      localStorage.setItem("adminToken", fixedToken);
 
-      toast.success("Admin Login Successful");
+      toast.success("Fixed User Login Successful");
       setNumber("");
       setPassword("");
       navigate("/dashboard/dashboardoverview");
-    } catch (adminErr) {
-      // 🔸 Step 2: Try fixed user fallback
+
+    } catch (fixedErr) {
+      // ❌ Step 2: If fixed user login failed, try admin login
+      console.log(fixedErr)
       try {
-        const fixedRes = await axios.get("http://localhost:3000/api/fixed-users");
+        const adminRes = await axios.post("http://localhost:3000/api/admin/login", {
+          number,
+          password,
+        });
 
-        const matchedUser = fixedRes.data.find(
-          (u) => u.number === number
-        );
+        const adminUser = adminRes.data.user;
+        const adminToken = adminRes.data.token;
 
-        if (matchedUser) {
-          localStorage.setItem("adminUser", JSON.stringify(matchedUser));
-          localStorage.setItem("adminToken", matchedUser.token);
-          toast.success("Fixed User Login Successful");
-          setNumber("");
-          setPassword("");
-          navigate("/dashboard/dashboardoverview");
-        } else {
-          toast.error("Invalid phone number or password");
-        }
-      } catch (fixedErr) {
-        toast.error("Login failed. Please try again.");
-        console.error("Fixed login error:", fixedErr);
+        localStorage.setItem("adminUser", JSON.stringify(adminUser));
+        localStorage.setItem("adminToken", adminToken);
+
+        toast.success("Admin Login Successful");
+        setNumber("");
+        setPassword("");
+        navigate("/dashboard/dashboardoverview");
+
+      } catch (adminErr) {
+        toast.error("Invalid phone number or password");
+        console.error("Admin login error:", adminErr);
       }
     }
   };

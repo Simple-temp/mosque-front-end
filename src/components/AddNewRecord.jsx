@@ -49,35 +49,80 @@ const AddNewRecord = () => {
     setSpecialUser({ ...specialUser, [field]: e.target.value });
   };
 
- const handleSubmitNormal = async () => {
+  const handleSubmitNormal = async () => {
     try {
-      const res = await axios.post("http://localhost:3000/api/add-user", {
-        ...normalUser,
-        userType: "normal",
-      });
-      console.log(res.data)
-      toast.success("🎉 Normal user registered!");
-      setNormalUser({ name: "", address: "", number: "", amount: "", email: "" });
-    } catch (error) {
-      toast.error("🚫 Failed to register normal user!");
-      console.log(error)
+      const token = localStorage.getItem("adminToken");
+      const userType = JSON.parse(localStorage.getItem("adminUser"));
+      const adminData = JSON.parse(localStorage.getItem("adminUser"));
+      const adminId = adminData?._id;
+
+      // Prepare payload with submittedBy based on userType
+    const payload = {
+      ...normalUser,
+      userType: "normal",
+    };
+
+    if (userType?.role === "admin") {
+      payload.submittedByAdmin = adminId;
+    } else if (userType?.role === "fixed") {
+      payload.submittedByFixedUser = adminId;
     }
+
+    const res = await axios.post("http://localhost:3000/api/add-user", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    console.log(res)
+
+    toast.success("🎉 Normal user registered!");
+    setNormalUser({ name: "", address: "", number: "", amount: "", email: "" });
+  } catch (error) {
+    if (error.response?.status === 409) {
+      toast.error("⚠️ Number or email already exists!");
+    } else {
+      toast.error("🚫 Failed to register normal user!");
+    }
+    console.error(error);
+  }
   };
 
   const handleSubmitSpecial = async () => {
     try {
-      const res = await axios.post("http://localhost:3000/api/add-user", {
-        ...specialUser,
-        userType: "special",
-      });
-      console.log(res.data)
-      toast.success("🎊 Special user registered!");
-      setSpecialUser({ name: "", address: "", number: "", paidAmount: "", email: "", fixedAmount: "", role: "" });
-    } catch (error) {
-      toast.error("❌ Failed to register special user!");
-       console.log(error)
+      const token = localStorage.getItem("adminToken");
+      const userType = JSON.parse(localStorage.getItem("adminUser"));
+      const adminData = JSON.parse(localStorage.getItem("adminUser"));
+      const adminId = adminData?._id;
+
+      const payload = {
+      ...specialUser,
+      userType: "special",
+    };
+
+    if (userType?.role === "admin") {
+      payload.submittedByAdmin = adminId;
+    } else if (userType?.role === "fixed") {
+      payload.submittedByFixedUser = adminId;
     }
+
+    const res = await axios.post("http://localhost:3000/api/add-user", payload, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    
+    console.log(res)
+
+    toast.success("🎊 Special user registered!");
+    setSpecialUser({ name: "", address: "", number: "", paidAmount: "", email: "", fixedAmount: "", role: "" });
+  } catch (error) {
+    if (error.response?.status === 409) {
+      toast.error("⚠️ Number or email already exists!");
+    } else {
+      toast.error("❌ Failed to register special user!");
+    }
+    console.error(error);
+  }
   };
+
   return (
     <Box sx={{ p: 4 }}>
       <ToastContainer position="top-right" autoClose={2000} />
@@ -131,23 +176,28 @@ const AddNewRecord = () => {
             </Select>
           </FormControl>
         </Grid>
-        {["name", "address", "number", "paidAmount", "email", "fixedAmount"].map(
-          (field) => (
-            <Grid item xs={12} md={4} key={field}>
-              <TextField
-                label={
-                  field === "fixedAmount"
-                    ? "Fixed Amount"
-                    : field.charAt(0).toUpperCase() + field.slice(1)
-                }
-                value={specialUser[field]}
-                onChange={handleSpecialChange(field)}
-                fullWidth
-                sx={greenOutline}
-              />
-            </Grid>
-          )
-        )}
+        {[
+          "name",
+          "address",
+          "number",
+          "paidAmount",
+          "email",
+          "fixedAmount",
+        ].map((field) => (
+          <Grid item xs={12} md={4} key={field}>
+            <TextField
+              label={
+                field === "fixedAmount"
+                  ? "Fixed Amount"
+                  : field.charAt(0).toUpperCase() + field.slice(1)
+              }
+              value={specialUser[field]}
+              onChange={handleSpecialChange(field)}
+              fullWidth
+              sx={greenOutline}
+            />
+          </Grid>
+        ))}
       </Grid>
       <Box sx={{ mt: 2 }}>
         <Button
