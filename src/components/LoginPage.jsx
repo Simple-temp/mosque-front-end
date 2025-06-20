@@ -32,7 +32,7 @@ const LoginPage = () => {
       toast.success("Fixed User Login Successful");
       setNumber("");
       setPassword("");
-      navigate("/dashboard/dashboardoverview");
+      navigate("/dashboard/dashboardwelcome");
 
     } catch (fixedErr) {
       // ❌ Step 2: If fixed user login failed, try admin login
@@ -52,7 +52,7 @@ const LoginPage = () => {
         toast.success("Admin Login Successful");
         setNumber("");
         setPassword("");
-        navigate("/dashboard/dashboardoverview");
+        navigate("/dashboard/dashboardwelcome");
 
       } catch (adminErr) {
         toast.error("Invalid phone number or password");

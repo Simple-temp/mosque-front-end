@@ -8,7 +8,7 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import GroupRemoveIcon from "@mui/icons-material/GroupRemove";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import WorkHistoryIcon from '@mui/icons-material/WorkHistory';
+import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
 
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -51,11 +51,28 @@ const Home = () => {
               <WorkHistoryIcon /> My Collection
             </Link>
           </li>
-          <li>
-            <Link to="dashboardoverview" onClick={() => setSidebarOpen(false)}>
-              <DashboardIcon /> Dashboard
-            </Link>
-          </li>
+          {isAdmin && (
+            <>
+              <li>
+                <Link
+                  to="dashboardoverview"
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <DashboardIcon /> Dashboard
+                </Link>
+              </li>
+              <li>
+                <Link to="adminlist" onClick={() => setSidebarOpen(false)}>
+                  <AdminPanelSettingsIcon /> Admin List
+                </Link>
+              </li>
+              <li>
+                <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
+                  <AssignmentIndIcon /> Collectors
+                </Link>
+              </li>
+            </>
+          )}
           <li>
             <Link to="addnewrecord" onClick={() => setSidebarOpen(false)}>
               <AddCircleIcon /> Add New Record
@@ -76,22 +93,6 @@ const Home = () => {
               <GroupRemoveIcon /> Due Amount
             </Link>
           </li>
-
-          <li>
-            <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
-              <AssignmentIndIcon /> Collectors
-            </Link>
-          </li>
-
-          {isAdmin && (
-            <>
-              <li>
-                <Link to="adminlist" onClick={() => setSidebarOpen(false)}>
-                  <AdminPanelSettingsIcon /> Admin List
-                </Link>
-              </li>
-            </>
-          )}
 
           <li style={{ cursor: "pointer" }}>
             <span onClick={handleLogout}>

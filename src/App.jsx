@@ -14,6 +14,7 @@ import IndividualSearch from "./components/IndividualSearch";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MyAccount from "./components/MyAccount";
 import MyHistoray from "./components/MyHistoray";
+import DashBoardWelcomePage from "./components/DashBoardWelcomePage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Home />}>
+              <Route path="dashboardwelcome" element={<DashBoardWelcomePage />} />
               <Route path="myaccount" element={<MyAccount />} />
               <Route path="mycollection" element={<MyHistoray />} />
               <Route path="addnewrecord" element={<AddNewRecord />} />
