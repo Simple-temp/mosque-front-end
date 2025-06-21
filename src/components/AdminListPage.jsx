@@ -28,6 +28,27 @@ const AdminListPage = () => {
     retypePassword: "",
     email: "",
   });
+
+  const [numberMessage, setNumberMessage] = useState("");
+
+  const handleChangeNumber = (e) => {
+    const { name, value } = e.target;
+
+    setAdminData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+
+    if (name === "number") {
+      const numberRegex = /^01[2,3,4,5,6,7,8,9]\d{8}$/;
+      if (value.length === 11 && numberRegex.test(value)) {
+        setNumberMessage("✅ Number complete");
+      } else {
+        setNumberMessage("");
+      }
+    }
+  };
+
   const [currentId, setCurrentId] = useState(null);
 
   const fetchAdmins = async () => {
@@ -60,6 +81,7 @@ const AdminListPage = () => {
       toast.success("User Added");
     } catch (err) {
       toast.error("Failed to create user");
+      console.log(err);
     }
   };
 
@@ -87,6 +109,7 @@ const AdminListPage = () => {
       toast.success("User Deleted");
     } catch (err) {
       toast.error("Failed to delete user");
+      console.log(err)
     }
   };
 
@@ -218,10 +241,19 @@ const AdminListPage = () => {
               name="number"
               fullWidth
               value={adminData.number}
-              onChange={handleChange}
+              onChange={handleChangeNumber}
               margin="normal"
               required
+              inputProps={{ maxLength: 11 }}
             />
+            {numberMessage && (
+              <Typography
+                variant="body2"
+                style={{ color: "green", marginTop: "-10px" }}
+              >
+                {numberMessage}
+              </Typography>
+            )}
             <TextField
               label="Address"
               name="address"

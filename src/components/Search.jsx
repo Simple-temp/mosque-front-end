@@ -19,73 +19,9 @@ const Search = () => {
     role: "",
     email: "",
     userType: "",
-    dateRange: "", // values: '', '12h', '1d', '7d', '14d'
+    selectedDate: "", // ✅ Only this for date filter
   });
 
-  // Fetch all users on mount
-  useEffect(() => {
-    axios
-      .get("http://localhost:3000/api/search")
-      .then((res) => setUsers(res.data))
-      .catch((err) => console.error("Error fetching users:", err));
-  }, []);
-
-  // Handle text inputs change
-  const handleInputChange = (e) => {
-    const { placeholder, value } = e.target;
-    const key = placeholder.toLowerCase().split("by ")[1];
-    setFilters((prev) => ({ ...prev, [key]: value }));
-  };
-
-  // Handle date range select change
-  const handleDateChange = (e) => {
-    setFilters((prev) => ({ ...prev, dateRange: e.target.value }));
-  };
-
-  // Helper: filter users by date range
-  const filterByDateRange = (user) => {
-    if (!filters.dateRange) return true; // no date filter
-
-    const now = new Date();
-    const createdAt = new Date(user.createdAt);
-
-    switch (filters.dateRange) {
-      case "12h":
-        return createdAt >= new Date(now.getTime() - 12 * 60 * 60 * 1000);
-      case "1d":
-        return createdAt >= new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      case "7d":
-        return createdAt >= new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-      case "14d":
-        return createdAt >= new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-      default:
-        return true;
-    }
-  };
-
-  // Filter users by text and date
-  const filteredUsers = users.filter((user) => {
-    // date filter
-    if (!filterByDateRange(user)) return false;
-
-    // text filters (case-insensitive includes)
-    for (const [key, val] of Object.entries(filters)) {
-      if (key === "dateRange") continue; // skip dateRange key
-
-      if (
-        val &&
-        !(
-          user[key] &&
-          user[key].toString().toLowerCase().includes(val.toLowerCase())
-        )
-      ) {
-        return false;
-      }
-    }
-    return true;
-  });
-
-  // Fetch users on mount
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -99,7 +35,50 @@ const Search = () => {
     }
   };
 
-  // Delete user
+  const handleInputChange = (e) => {
+    const { placeholder, value } = e.target;
+    const key = placeholder.toLowerCase().split("by ")[1];
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const filteredUsers = users.filter((user) => {
+    const { selectedDate, ...textFilters } = filters;
+
+    // ✅ Filter by selected date
+    if (selectedDate) {
+      const userDate = new Date(user.timestamp);
+      const startOfDay = new Date(selectedDate);
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date(selectedDate);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      if (userDate < startOfDay || userDate > endOfDay) return false;
+    }
+
+    // ✅ Filter by text fields
+    for (const [key, val] of Object.entries(textFilters)) {
+      if (
+        val &&
+        !(
+          user[key] &&
+          user[key].toString().toLowerCase().includes(val.toLowerCase())
+        )
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 12;
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
@@ -110,16 +89,9 @@ const Search = () => {
     }
   };
 
-  // update
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [addedAmount, setAddedAmount] = useState("");
-
-  // const handleOpenDialog = (user) => {
-  //   setSelectedUser(user);
-  //   setAddedAmount("");
-  //   setOpenDialog(true);
-  // };
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
@@ -149,8 +121,8 @@ const Search = () => {
           [updatedField]: updatedValue,
         }
       );
-      console.log(res.data);
-      // Update local state
+      console.log(res);
+
       setUsers((prev) =>
         prev.map((u) =>
           u._id === selectedUser._id
@@ -158,7 +130,6 @@ const Search = () => {
             : u
         )
       );
-
       handleCloseDialog();
     } catch (error) {
       console.error("Update error:", error);
@@ -167,7 +138,6 @@ const Search = () => {
 
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
-
     return date.toLocaleString("en-BD", {
       timeZone: "Asia/Dhaka",
       year: "numeric",
@@ -176,23 +146,36 @@ const Search = () => {
       hour: "2-digit",
       minute: "2-digit",
       second: "2-digit",
-      hour12: true, // Enable AM/PM
+      hour12: true,
     });
   };
+
   return (
     <div className="serach-container">
       <div className="inner-search-container">
         <h1 className="search-title">Search</h1>
 
         <div className="inner-search-box">
-          <div className="inner-search-box-top">
-            <select value={filters.dateRange} onChange={handleDateChange}>
-              <option value="">Filter by Day</option>
-              <option value="12h">12 Hours Ago</option>
-              <option value="1d">1 Day Ago</option>
-              <option value="7d">7 Days Ago</option>
-              <option value="14d">14 Days Ago</option>
-            </select>
+          <div
+            className="inner-search-box-top"
+            style={{ display: "flex", gap: "10px", marginBottom: "15px" }}
+          >
+            <input
+              type="date"
+              value={filters.selectedDate}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...prev,
+                  selectedDate: e.target.value,
+                }))
+              }
+              style={{
+                padding: "6px 10px",
+                borderRadius: "4px",
+                border: "1px solid #ccc",
+                cursor: "pointer",
+              }}
+            />
           </div>
 
           <div className="inner-search-box-bottom">
@@ -239,42 +222,31 @@ const Search = () => {
                     <th>Email</th>
                     <th>Number</th>
                     <th>Address</th>
-                    <th>Fix Amount</th>                
+                    <th>Fix Amount</th>
                     <th>Paid</th>
                     <th>Due Amount</th>
-                    {/* <th>Add</th> */}
                     <th>Role</th>
                     <th>Delete</th>
-                    {/* <th>Update</th> */}
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsers.map((user, idx) => (
+                  {currentUsers.map((user, idx) => (
                     <tr key={user._id}>
-                      <td>{idx + 1}</td>
+                      <td>{indexOfFirstUser + idx + 1}</td>
                       <td>{formatTimestamp(user.timestamp)}</td>
                       <td>{user?.name}</td>
                       <td>{user?.email}</td>
                       <td>{user?.number}</td>
                       <td>{user?.address}</td>
                       <td className="fix">{user?.fixedAmount || "-"}</td>
-
                       <td className="paid">
                         {user?.paidAmount || user?.amount}
                       </td>
-                                            <td className="due">
+                      <td className="due">
                         {user?.fixedAmount
                           ? user?.fixedAmount - user?.paidAmount
                           : "-"}
                       </td>
-                      {/* <td className="add-money">
-                        <button
-                          className="add-money"
-                          onClick={() => handleOpenDialog(user)}
-                        >
-                          <AddIcon />
-                        </button>
-                      </td> */}
                       <td>{user?.role || "General"}</td>
                       <td>
                         <button
@@ -284,33 +256,56 @@ const Search = () => {
                           Delete
                         </button>
                       </td>
-                      {/* <td>
-                        <button className="update-btn">Update</button>
-                      </td> */}
                     </tr>
                   ))}
                 </tbody>
-                {/* Material UI Dialog */}
-                <Dialog open={openDialog} onClose={handleCloseDialog}>
-                  <DialogTitle>Add Money</DialogTitle>
-                  <DialogContent>
-                    <TextField
-                      autoFocus
-                      label="Amount"
-                      type="number"
-                      fullWidth
-                      value={addedAmount}
-                      onChange={(e) => setAddedAmount(e.target.value)}
-                    />
-                  </DialogContent>
-                  <DialogActions>
-                    <Button onClick={handleCloseDialog}>Cancel</Button>
-                    <Button variant="contained" onClick={handleConfirmAdd}>
-                      Confirm
-                    </Button>
-                  </DialogActions>
-                </Dialog>
               </table>
+
+              <div
+                style={{
+                  marginTop: "20px",
+                  display: "flex",
+                  justifyContent: "center",
+                }}
+              >
+                <Button
+                  variant="outlined"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage((prev) => prev - 1)}
+                >
+                  Previous
+                </Button>
+                <span style={{ margin: "0 15px", alignSelf: "center" }}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  variant="outlined"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage((prev) => prev + 1)}
+                >
+                  Next
+                </Button>
+              </div>
+
+              <Dialog open={openDialog} onClose={handleCloseDialog}>
+                <DialogTitle>Add Money</DialogTitle>
+                <DialogContent>
+                  <TextField
+                    autoFocus
+                    label="Amount"
+                    type="number"
+                    fullWidth
+                    value={addedAmount}
+                    onChange={(e) => setAddedAmount(e.target.value)}
+                  />
+                </DialogContent>
+                <DialogActions>
+                  <Button onClick={handleCloseDialog}>Cancel</Button>
+                  <Button variant="contained" onClick={handleConfirmAdd}>
+                    Confirm
+                  </Button>
+                </DialogActions>
+              </Dialog>
             </div>
           </div>
         </div>

@@ -33,6 +33,11 @@ const Dashboard = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this record?"
+    );
+    if (!confirmDelete) return;
+
     try {
       await axios.delete(`http://localhost:3000/api/users/${id}`);
       setUsers((prev) => prev.filter((user) => user._id !== id));
@@ -111,6 +116,12 @@ const Dashboard = () => {
     fetchAdmins();
   }, []);
 
+  const tdStyle = {
+    border: "1px solid #ccc",
+    textAlign: "center",
+    padding: "8px",
+  };
+
   return (
     <div className="dashboard-wrapper">
       <ToastContainer position="top-right" autoClose={2000} />
@@ -141,47 +152,71 @@ const Dashboard = () => {
           <div className="wrapper-dashboard-left-side-bottom">
             <h3>Record Table</h3>
             <div className="responsive-table">
-              <table>
+              <table
+                style={{
+                  width: "100%",
+                  borderCollapse: "collapse",
+                  border: "1px solid #ccc",
+                }}
+              >
                 <thead>
                   <tr>
-                    <th style={{textAlign:"center"}}>ID</th>
-                    <th style={{textAlign:"center"}}>Name</th>
-                    <th style={{textAlign:"center"}}>Number</th>
-                    <th style={{textAlign:"center"}}>Address</th>
-                    <th style={{textAlign:"center"}}>FixedAmount</th>
-                    <th style={{textAlign:"center"}}>Paid</th>
-                    <th style={{textAlign:"center"}}>Due</th>
-                    <th style={{textAlign:"center"}}>Role</th>
-                    <th style={{textAlign:"center"}}>Delete</th>
-                    <th style={{textAlign:"center"}}>Update</th>
+                    {[
+                      "ID",
+                      "Name",
+                      "Number",
+                      "Address",
+                      "FixedAmount",
+                      "Paid",
+                      "Due",
+                      "Role",
+                      "Delete",
+                      "Update",
+                    ].map((heading) => (
+                      <th
+                        key={heading}
+                        style={{
+                          border: "1px solid #ccc",
+                          textAlign: "center",
+                          padding: "8px",
+                          backgroundColor: "#f5f5f5",
+                        }}
+                      >
+                        {heading}
+                      </th>
+                    ))}
                   </tr>
                 </thead>
                 <tbody>
                   {currentUsers.map((user, idx) => (
                     <tr key={user._id}>
-                      <td>{indexOfFirstUser + idx + 1}</td>
-                      <td>
+                      <td style={tdStyle}>{indexOfFirstUser + idx + 1}</td>
+                      <td style={tdStyle}>
                         <Tooltip title={user.name}>
                           <span>{user.name?.slice(0, 4)}...</span>
                         </Tooltip>
                       </td>
-                      <td>
+                      <td style={tdStyle}>
                         <Tooltip title={user.number}>
                           <span>{user.number?.slice(0, 11)}...</span>
                         </Tooltip>
                       </td>
-                      <td>
+                      <td style={tdStyle}>
                         <Tooltip title={user.address || "-"}>
                           <span>{(user.address || "-").slice(0, 6)}...</span>
                         </Tooltip>
                       </td>
-                      <td>{user.fixedAmount || "-"}</td>
-                      <td>{user.paidAmount || user.amount || "-"}</td>
-                      <td className="due-amount-color">
+                      <td style={tdStyle}>{user.fixedAmount || "-"}</td>
+                      <td style={tdStyle}>
+                        {user.paidAmount || user.amount || "-"}
+                      </td>
+                      <td
+                        style={{ ...tdStyle, color: "red", fontWeight: "bold" }}
+                      >
                         {user.fixedAmount - user.paidAmount || "-"}
                       </td>
-                      <td>{user.role || "User"}</td>
-                      <td>
+                      <td style={tdStyle}>{user.role || "User"}</td>
+                      <td style={tdStyle}>
                         <button
                           className="btn-delete"
                           onClick={() => handleDelete(user._id)}
@@ -189,7 +224,7 @@ const Dashboard = () => {
                           Delete
                         </button>
                       </td>
-                      <td>
+                      <td style={tdStyle}>
                         <button
                           className="btn-update"
                           onClick={() => handleEditOpen(user)}
@@ -302,22 +337,45 @@ const Dashboard = () => {
             <div className="due-amount">
               <h3>Due Amount User List</h3>
               <div className="responsive-table">
-                <table>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    border: "1px solid #ccc",
+                  }}
+                >
                   <thead>
                     <tr>
-                      <th style={{textAlign:"center"}}>ID</th>
-                      <th style={{textAlign:"center"}}>Name</th>
-                      <th style={{textAlign:"center"}}>Due Amount</th>
-                      <th style={{textAlign:"center"}}>View</th>
+                      {["ID", "Name", "Due Amount", "View"].map((header) => (
+                        <th
+                          key={header}
+                          style={{
+                            border: "1px solid #ccc",
+                            textAlign: "center",
+                            padding: "8px",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          {header}
+                        </th>
+                      ))}
                     </tr>
                   </thead>
                   <tbody>
                     {dueUsers.map((user, idx) => (
                       <tr key={user._id || idx}>
-                        <td>{idx + 1}</td>
-                        <td>{user.name}</td>
-                        <td>{user.fixedAmount - user.paidAmount}</td>
-                        <td>
+                        <td style={tdStyle}>{idx + 1}</td>
+                        <td style={tdStyle}>{user.name}</td>
+                        <td
+                          style={{
+                            ...tdStyle,
+                            color: "red",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          {user.fixedAmount - user.paidAmount}
+                        </td>
+                        <td style={tdStyle}>
                           <button
                             className="btn-view"
                             onClick={() => handleView(user)}
@@ -373,61 +431,44 @@ const Dashboard = () => {
               </Modal>
             </div>
 
-            {/* <div className="admin-list">
-              <h3>Collector List</h3>
-              <div className="responsive-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>ID</th>
-                      <th>Name</th>
-                      <th>Number</th>
-                      <th>Email</th>
-                      <th>Address</th>
-                      <th>View</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[1, 2, 3].map((id) => (
-                      <tr key={id}>
-                        <td>{id}</td>
-                        <td>Admin {id}</td>
-                        <td>Admin</td>
-                        <td>example@gmail.com</td>
-                        <td>1000</td>
-                        <td>
-                          <button className="btn-view">View</button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div> */}
-
             <div className="admin-list">
               <h3>Total Collectors List: {admins.length}</h3>
               <div className="responsive-table">
-                <table>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    border: "1px solid #ccc",
+                  }}
+                >
                   <thead>
                     <tr>
-                      <th style={{textAlign:"center"}}>ID</th>
-                      <th style={{textAlign:"center"}}>Name</th>
-                      <th style={{textAlign:"center"}}>Number</th>
-                      <th style={{textAlign:"center"}}>Email</th>
-                      <th style={{textAlign:"center"}}>Address</th>
-                      <th style={{textAlign:"center"}}>View</th>
+                      {["ID", "Name", "Number", "Email", "Address", "View"].map(
+                        (header) => (
+                          <th
+                            key={header}
+                            style={{
+                              border: "1px solid #ccc",
+                              textAlign: "center",
+                              padding: "8px",
+                              backgroundColor: "#f5f5f5",
+                            }}
+                          >
+                            {header}
+                          </th>
+                        )
+                      )}
                     </tr>
                   </thead>
                   <tbody>
                     {admins.map((admin, idx) => (
                       <tr key={admin._id}>
-                        <td>{idx + 1}</td>
-                        <td>{admin.name}</td>
-                        <td>{admin.number}</td>
-                        <td>{admin.email}</td>
-                        <td>{admin.address}</td>
-                        <td>
+                        <td style={tdStyle}>{idx + 1}</td>
+                        <td style={tdStyle}>{admin.name}</td>
+                        <td style={tdStyle}>{admin.number}</td>
+                        <td style={tdStyle}>{admin.email}</td>
+                        <td style={tdStyle}>{admin.address}</td>
+                        <td style={tdStyle}>
                           <button
                             className="btn-view"
                             onClick={() => setSelectedAdmin(admin)}

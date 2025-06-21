@@ -41,12 +41,43 @@ const AddNewRecord = () => {
     role: "",
   });
 
+  const [numberMessage, setNumberMessage] = useState("");
+  const [numberMessageSpecial, setNumberMessageSpecial] = useState("");
+
   const handleNormalChange = (field) => (e) => {
-    setNormalUser({ ...normalUser, [field]: e.target.value });
+    const value = e.target.value;
+
+    setNormalUser((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    if (field === "number") {
+      const numberRegex = /^01[2-9]\d{8}$/;
+      if (value.length === 11 && numberRegex.test(value)) {
+        setNumberMessage("✅ Number complete");
+      } else {
+        setNumberMessage("");
+      }
+    }
   };
 
   const handleSpecialChange = (field) => (e) => {
-    setSpecialUser({ ...specialUser, [field]: e.target.value });
+    const value = e.target.value;
+
+    setSpecialUser((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+    if (field === "number") {
+      const numberRegex = /^01[2-9]\d{8}$/;
+      if (value.length === 11 && numberRegex.test(value)) {
+        setNumberMessageSpecial("✅ Number complete");
+      } else {
+        setNumberMessageSpecial("");
+      }
+    }
   };
 
   const handleSubmitNormal = async () => {
@@ -57,33 +88,43 @@ const AddNewRecord = () => {
       const adminId = adminData?._id;
 
       // Prepare payload with submittedBy based on userType
-    const payload = {
-      ...normalUser,
-      userType: "normal",
-    };
+      const payload = {
+        ...normalUser,
+        userType: "normal",
+      };
 
-    if (userType?.role === "admin") {
-      payload.submittedByAdmin = adminId;
-    } else if (userType?.role === "fixed") {
-      payload.submittedByFixedUser = adminId;
+      if (userType?.role === "admin") {
+        payload.submittedByAdmin = adminId;
+      } else if (userType?.role === "fixed") {
+        payload.submittedByFixedUser = adminId;
+      }
+
+      const res = await axios.post(
+        "http://localhost:3000/api/add-user",
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log(res);
+
+      toast.success("🎉 Normal user registered!");
+      setNormalUser({
+        name: "",
+        address: "",
+        number: "",
+        amount: "",
+        email: "",
+      });
+    } catch (error) {
+      if (error.response?.status === 409) {
+        toast.error("⚠️ Number or email already exists!");
+      } else {
+        toast.error("🚫 Failed to register normal user!");
+      }
+      console.error(error);
     }
-
-    const res = await axios.post("http://localhost:3000/api/add-user", payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    console.log(res)
-
-    toast.success("🎉 Normal user registered!");
-    setNormalUser({ name: "", address: "", number: "", amount: "", email: "" });
-  } catch (error) {
-    if (error.response?.status === 409) {
-      toast.error("⚠️ Number or email already exists!");
-    } else {
-      toast.error("🚫 Failed to register normal user!");
-    }
-    console.error(error);
-  }
   };
 
   const handleSubmitSpecial = async () => {
@@ -94,33 +135,44 @@ const AddNewRecord = () => {
       const adminId = adminData?._id;
 
       const payload = {
-      ...specialUser,
-      userType: "special",
-    };
+        ...specialUser,
+        userType: "special",
+      };
 
-    if (userType?.role === "admin") {
-      payload.submittedByAdmin = adminId;
-    } else if (userType?.role === "fixed") {
-      payload.submittedByFixedUser = adminId;
+      if (userType?.role === "admin") {
+        payload.submittedByAdmin = adminId;
+      } else if (userType?.role === "fixed") {
+        payload.submittedByFixedUser = adminId;
+      }
+
+      const res = await axios.post(
+        "http://localhost:3000/api/add-user",
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log(res);
+
+      toast.success("🎊 Special user registered!");
+      setSpecialUser({
+        name: "",
+        address: "",
+        number: "",
+        paidAmount: "",
+        email: "",
+        fixedAmount: "",
+        role: "",
+      });
+    } catch (error) {
+      if (error.response?.status === 409) {
+        toast.error("⚠️ Number or email already exists!");
+      } else {
+        toast.error("❌ Failed to register special user!");
+      }
+      console.error(error);
     }
-
-    const res = await axios.post("http://localhost:3000/api/add-user", payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    
-    console.log(res)
-
-    toast.success("🎊 Special user registered!");
-    setSpecialUser({ name: "", address: "", number: "", paidAmount: "", email: "", fixedAmount: "", role: "" });
-  } catch (error) {
-    if (error.response?.status === 409) {
-      toast.error("⚠️ Number or email already exists!");
-    } else {
-      toast.error("❌ Failed to register special user!");
-    }
-    console.error(error);
-  }
   };
 
   return (
@@ -139,10 +191,23 @@ const AddNewRecord = () => {
               onChange={handleNormalChange(field)}
               fullWidth
               sx={greenOutline}
+              inputProps={field === "number" ? { maxLength: 11 } : {}}
             />
           </Grid>
         ))}
+
+        {numberMessage && (
+          <Grid item xs={12} md={4}>
+            <Typography
+              variant="body2"
+              style={{ color: "green", marginTop: "-10px" }}
+            >
+              {numberMessage}
+            </Typography>
+          </Grid>
+        )}
       </Grid>
+
       <Box sx={{ mt: 2 }}>
         <Button
           variant="contained"
@@ -176,6 +241,7 @@ const AddNewRecord = () => {
             </Select>
           </FormControl>
         </Grid>
+
         {[
           "name",
           "address",
@@ -195,10 +261,21 @@ const AddNewRecord = () => {
               onChange={handleSpecialChange(field)}
               fullWidth
               sx={greenOutline}
+              inputProps={field === "number" ? { maxLength: 11 } : {}}
             />
+            {/* ✅ Only show message for number field */}
+            {field === "number" && numberMessageSpecial && (
+              <Typography
+                variant="body2"
+                style={{ color: "green", marginTop: "-10px" }}
+              >
+                {numberMessageSpecial}
+              </Typography>
+            )}
           </Grid>
         ))}
       </Grid>
+
       <Box sx={{ mt: 2 }}>
         <Button
           variant="contained"
