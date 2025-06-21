@@ -72,7 +72,7 @@ const Search = () => {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 12;
+  const usersPerPage = 8;
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
