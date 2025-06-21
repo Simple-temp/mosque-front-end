@@ -49,101 +49,44 @@ const FixedAmountPage = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // const fetchUsers = async () => {
-  //   try {
-  //     const userData = JSON.parse(localStorage.getItem("adminUser")); // Contains _id and role
-  //     const loggedInUserId = userData?._id;
-  //     const userRole = userData?.role;
-
-  //     const res = await axios.get("http://localhost:3000/api/fixed-users");
-  //     const fixedUsers = res.data;
-
-  //     const collectionRes = await axios.get("http://localhost:3000/api/users");
-  //     const collections = collectionRes.data;
-
-  //     // Step 1: Filter collections submitted by the logged-in user
-  //     const userCollections = collections.filter((item) => {
-  //       if (userRole === "admin") {
-  //         return item.submittedByAdmin === loggedInUserId;
-  //       } else if (userRole === "fixed") {
-  //         return item.submittedByFixedUser === loggedInUserId;
-  //       }
-  //       return false;
-  //     });
-
-  //     let total = 0;
-  //     let totalNormal = 0;
-  //     let totalSpecial = 0;
-
-  //     userCollections.forEach((entry) => {
-  //       if (entry.userType === "normal" && entry.amount) {
-  //         total += Number(entry.amount);
-  //         totalNormal += Number(entry.amount);
-  //       } else if (entry.userType === "special" && entry.paidAmount) {
-  //         total += Number(entry.paidAmount);
-  //         totalSpecial += Number(entry.paidAmount);
-  //       }
-  //     });
-
-  //     const collectionCount = userCollections.length;
-
-  //     // ✅ Add actualAmount = fixedAmount - paidAmount for each special user
-  //     const updatedUsers = fixedUsers.map((user) => {
-  //       const fixed = Number(user.fixedAmount) || 0;
-  //       const paid = Number(user.paidAmount) || 0;
-
-  //       return {
-  //         ...user,
-  //         totalCollection: total,
-  //         collectionCount: collectionCount,
-  //         actualAmount: fixed - paid,
-  //       };
-  //     });
-
-  //     setUsers(updatedUsers);
-  //   } catch (error) {
-  //     console.error("Error fetching users:", error);
-  //   }
-  // };
-
   const fetchUsers = async () => {
-  try {
-    const res = await axios.get("http://localhost:3000/api/fixed-users");
-    const fixedUsers = res.data;
+    try {
+      const res = await axios.get("http://localhost:3000/api/fixed-users");
+      const fixedUsers = res.data;
 
-    const collectionRes = await axios.get("http://localhost:3000/api/users");
-    const collections = collectionRes.data;
+      const collectionRes = await axios.get("http://localhost:3000/api/users");
+      const collections = collectionRes.data;
 
-    const updatedUsers = fixedUsers.map((user) => {
-      // Filter collections that belong to this fixed user
-      const userCollections = collections.filter(
-        (entry) => entry.submittedByFixedUser === user._id
-      );
+      const updatedUsers = fixedUsers.map((user) => {
+        // Filter collections that belong to this fixed user
+        const userCollections = collections.filter(
+          (entry) => entry.submittedByFixedUser === user._id
+        );
 
-      let total = 0;
+        let total = 0;
 
-      userCollections.forEach((entry) => {
-        if (entry.userType === "normal" && entry.amount) {
-          total += Number(entry.amount);
-        } else if (entry.userType === "special" && entry.paidAmount) {
-          total += Number(entry.paidAmount);
-        }
+        userCollections.forEach((entry) => {
+          if (entry.userType === "normal" && entry.amount) {
+            total += Number(entry.amount);
+          } else if (entry.userType === "special" && entry.paidAmount) {
+            total += Number(entry.paidAmount);
+          }
+        });
+
+        return {
+          ...user,
+          totalCollection: total,
+          collectionCount: userCollections.length,
+          actualAmount:
+            (Number(user.fixedAmount) || 0) - (Number(user.paidAmount) || 0),
+        };
       });
 
-      return {
-        ...user,
-        totalCollection: total,
-        collectionCount: userCollections.length,
-        actualAmount: (Number(user.fixedAmount) || 0) - (Number(user.paidAmount) || 0),
-      };
-    });
-
-    setUsers(updatedUsers);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-  }
-};
-
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();

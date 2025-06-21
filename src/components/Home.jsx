@@ -71,6 +71,11 @@ const Home = () => {
                   <AssignmentIndIcon /> Collectors
                 </Link>
               </li>
+              <li>
+                <Link to="dueamount" onClick={() => setSidebarOpen(false)}>
+                  <GroupRemoveIcon /> Due Amount
+                </Link>
+              </li>
             </>
           )}
           <li>
@@ -88,12 +93,6 @@ const Home = () => {
               <YoutubeSearchedForIcon /> Individual Search
             </Link>
           </li>
-          <li>
-            <Link to="dueamount" onClick={() => setSidebarOpen(false)}>
-              <GroupRemoveIcon /> Due Amount
-            </Link>
-          </li>
-
           <li style={{ cursor: "pointer" }}>
             <span onClick={handleLogout}>
               <LogoutIcon /> Logout
