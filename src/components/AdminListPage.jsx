@@ -29,6 +29,8 @@ const AdminListPage = () => {
     email: "",
   });
 
+  const token = JSON.parse(localStorage.getItem("adminToken"));
+
   const [numberMessage, setNumberMessage] = useState("");
 
   const handleChangeNumber = (e) => {
@@ -73,6 +75,7 @@ const AdminListPage = () => {
     }
 
     const { retypePassword, ...dataToSend } = adminData;
+    console.log(retypePassword);
 
     try {
       await axios.post("http://localhost:3000/api/admin/create", dataToSend);
@@ -88,17 +91,22 @@ const AdminListPage = () => {
   const handleUpdate = async (e) => {
     e.preventDefault();
     const { retypePassword, ...dataToSend } = adminData;
+    console.log(retypePassword);
 
     try {
       await axios.put(
         `http://localhost:3000/api/admin/${currentId}`,
-        dataToSend
+        dataToSend,
+        {
+          headers: { authorization: `Bearer ${token}` },
+        }
       );
       fetchAdmins();
       handleClose();
       toast.success("User Updated");
     } catch (err) {
       toast.error("Failed to update user");
+      console.log(err);
     }
   };
 
@@ -109,7 +117,7 @@ const AdminListPage = () => {
       toast.success("User Deleted");
     } catch (err) {
       toast.error("Failed to delete user");
-      console.log(err)
+      console.log(err);
     }
   };
 

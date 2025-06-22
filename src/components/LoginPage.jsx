@@ -8,6 +8,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  const Token = JSON.parse(localStorage.getItem("adminToken"));
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -17,46 +18,58 @@ const LoginPage = () => {
     }
 
     try {
-      // ✅ Step 1: Try Fixed User Login
-      const fixedUserRes = await axios.post("http://localhost:3000/api/fixed-users/login", {
-        number,
-        password,
-      });
+      // ✅ Step 1: Try Admin Login
+      const userRes = await axios.post(
+        "http://localhost:3000/api/admin/login", // Assuming you have a login endpoint for users
+        {
+          number,
+          password,
+        },
+        {
+          headers: { authorization: `Bearer ${Token}` },
+        }
+      );
 
-      const fixedUser = fixedUserRes.data.user;
-      const fixedToken = fixedUserRes.data.token;
+      const user = userRes.data.user;
+      const token = userRes.data.token;
 
-      localStorage.setItem("adminUser", JSON.stringify(fixedUser));
-      localStorage.setItem("adminToken", fixedToken);
+      localStorage.setItem("adminUser", JSON.stringify(user));
+      localStorage.setItem("adminToken", token);
 
-      toast.success("Fixed User Login Successful");
+      toast.success("Admin Login Successful");
       setNumber("");
       setPassword("");
       navigate("/dashboard/dashboardwelcome");
+    } catch (userErr) {
+      console.log("User login failed, checking fixed user...");
+      console.log(userErr)
 
-    } catch (fixedErr) {
-      // ❌ Step 2: If fixed user login failed, try admin login
-      console.log(fixedErr)
       try {
-        const adminRes = await axios.post("http://localhost:3000/api/admin/login", {
-          number,
-          password,
-        });
+        // ❌ Step 2: If user login failed, try fixed user login
+        const fixedUserRes = await axios.post(
+          "http://localhost:3000/api/fixed-users/login",
+          {
+            number,
+            password,
+          },
+          {
+            headers: { authorization: `Bearer ${Token}` },
+          }
+        );
 
-        const adminUser = adminRes.data.user;
-        const adminToken = adminRes.data.token;
+        const fixedUser = fixedUserRes.data.user;
+        const fixedToken = fixedUserRes.data.token;
 
-        localStorage.setItem("adminUser", JSON.stringify(adminUser));
-        localStorage.setItem("adminToken", adminToken);
+        localStorage.setItem("adminUser", JSON.stringify(fixedUser));
+        localStorage.setItem("adminToken", fixedToken);
 
-        toast.success("Admin Login Successful");
+        toast.success("Fixed User Login Successful");
         setNumber("");
         setPassword("");
         navigate("/dashboard/dashboardwelcome");
-
-      } catch (adminErr) {
+      } catch (fixedErr) {
         toast.error("Invalid phone number or password");
-        console.error("Admin login error:", adminErr);
+        console.error("Fixed user login error:", fixedErr);
       }
     }
   };
