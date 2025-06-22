@@ -8,7 +8,6 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const Token = JSON.parse(localStorage.getItem("adminToken"));
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -25,9 +24,6 @@ const LoginPage = () => {
           number,
           password,
         },
-        {
-          headers: { authorization: `Bearer ${Token}` },
-        }
       );
 
       const user = userRes.data.user;
@@ -52,9 +48,6 @@ const LoginPage = () => {
             number,
             password,
           },
-          {
-            headers: { authorization: `Bearer ${Token}` },
-          }
         );
 
         const fixedUser = fixedUserRes.data.user;

@@ -151,6 +151,11 @@ const FixedAmountPage = () => {
   };
 
   const handleDelete = async (id) => {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this record? it's also delete the user all record data"
+    );
+    if (!confirmDelete) return;
+
     await axios.delete(
       `https://mosque-back-end.onrender.com/api/fixed-users/${id}`
     );

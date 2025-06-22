@@ -29,8 +29,6 @@ const AdminListPage = () => {
     email: "",
   });
 
-  const token = JSON.parse(localStorage.getItem("adminToken"));
-
   const [numberMessage, setNumberMessage] = useState("");
 
   const handleChangeNumber = (e) => {
@@ -102,9 +100,6 @@ const AdminListPage = () => {
       await axios.put(
         `https://mosque-back-end.onrender.com/api/admin/${currentId}`,
         dataToSend,
-        {
-          headers: { authorization: `Bearer ${token}` },
-        }
       );
       fetchAdmins();
       handleClose();
