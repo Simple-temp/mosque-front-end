@@ -31,7 +31,9 @@ const MyHistoray = () => {
       const user = JSON.parse(localStorage.getItem("adminUser"));
       const userId = user?._id;
 
-      const res = await axios.get("http://localhost:3000/api/users");
+      const res = await axios.get(
+        "https://mosque-back-end.onrender.com/api/users"
+      );
       const data = res.data;
 
       const filteredData = data.filter(
@@ -57,7 +59,9 @@ const MyHistoray = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/users/${id}`);
+      await axios.delete(
+        `https://mosque-back-end.onrender.com/api/users/${id}`
+      );
       fetchUserHistory();
     } catch (err) {
       console.error("Delete failed", err);

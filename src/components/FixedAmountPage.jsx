@@ -71,10 +71,14 @@ const FixedAmountPage = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/fixed-users");
+      const res = await axios.get(
+        "https://mosque-back-end.onrender.com/api/fixed-users"
+      );
       const fixedUsers = res.data;
 
-      const collectionRes = await axios.get("http://localhost:3000/api/users");
+      const collectionRes = await axios.get(
+        "https://mosque-back-end.onrender.com/api/users"
+      );
       const collections = collectionRes.data;
 
       const updatedUsers = fixedUsers.map((user) => {
@@ -126,12 +130,15 @@ const FixedAmountPage = () => {
 
       if (editingId) {
         await axios.put(
-          `http://localhost:3000/api/fixed-users/${editingId}`,
+          `https://mosque-back-end.onrender.com/api/fixed-users/${editingId}`,
           payload
         );
         toast.success("User Updated");
       } else {
-        await axios.post("http://localhost:3000/api/fixed-users", payload);
+        await axios.post(
+          "https://mosque-back-end.onrender.com/api/fixed-users",
+          payload
+        );
         toast.success("User Added");
       }
 
@@ -144,7 +151,9 @@ const FixedAmountPage = () => {
   };
 
   const handleDelete = async (id) => {
-    await axios.delete(`http://localhost:3000/api/fixed-users/${id}`);
+    await axios.delete(
+      `https://mosque-back-end.onrender.com/api/fixed-users/${id}`
+    );
     fetchUsers();
     toast.success("Delete user!");
   };

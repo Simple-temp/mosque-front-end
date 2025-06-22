@@ -54,7 +54,9 @@ const AdminListPage = () => {
   const [currentId, setCurrentId] = useState(null);
 
   const fetchAdmins = async () => {
-    const res = await axios.get("http://localhost:3000/api/admin");
+    const res = await axios.get(
+      "https://mosque-back-end.onrender.com/api/admin"
+    );
     setAdmins(res.data);
   };
 
@@ -78,7 +80,10 @@ const AdminListPage = () => {
     console.log(retypePassword);
 
     try {
-      await axios.post("http://localhost:3000/api/admin/create", dataToSend);
+      await axios.post(
+        "https://mosque-back-end.onrender.com/api/admin/create",
+        dataToSend
+      );
       fetchAdmins();
       handleClose();
       toast.success("User Added");
@@ -95,7 +100,7 @@ const AdminListPage = () => {
 
     try {
       await axios.put(
-        `http://localhost:3000/api/admin/${currentId}`,
+        `https://mosque-back-end.onrender.com/api/admin/${currentId}`,
         dataToSend,
         {
           headers: { authorization: `Bearer ${token}` },
@@ -112,7 +117,9 @@ const AdminListPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/api/admin/${id}`);
+      await axios.delete(
+        `https://mosque-back-end.onrender.com/api/admin/${id}`
+      );
       fetchAdmins();
       toast.success("User Deleted");
     } catch (err) {

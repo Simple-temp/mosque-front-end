@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  Grid,
-  Paper,
-} from "@mui/material";
+import { Box, Typography, TextField, Button, Grid, Paper } from "@mui/material";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -30,8 +23,8 @@ const MyAccount = () => {
 
       const api =
         role === "admin"
-          ? `http://localhost:3000/api/admin/${userId}`
-          : `http://localhost:3000/api/fixed-users/${userId}`;
+          ? `https://mosque-back-end.onrender.com/api/admin/${userId}`
+          : `https://mosque-back-end.onrender.com/api/fixed-users/${userId}`;
 
       const res = await axios.get(api);
       const data = res.data;
@@ -56,7 +49,8 @@ const MyAccount = () => {
   };
 
   const handleUpdate = async () => {
-    const { name, number, address, email, password, confirmPassword } = formData;
+    const { name, number, address, email, password, confirmPassword } =
+      formData;
 
     if (password && password !== confirmPassword) {
       toast.error("Passwords do not match");
@@ -70,8 +64,8 @@ const MyAccount = () => {
 
       const api =
         role === "admin"
-          ? `http://localhost:3000/api/admin/${userId}`
-          : `http://localhost:3000/api/fixed-users/${userId}`;
+          ? `https://mosque-back-end.onrender.com/api/admin/${userId}`
+          : `https://mosque-back-end.onrender.com/api/fixed-users/${userId}`;
 
       const payload = { name, number, address, email };
       if (password) payload.password = password;
@@ -80,7 +74,7 @@ const MyAccount = () => {
 
       toast.success("✅ Profile updated successfully");
       getUserData(); // Refresh data
-      console.log(res)
+      console.log(res);
     } catch (err) {
       toast.error("❌ Failed to update profile");
       console.error(err);

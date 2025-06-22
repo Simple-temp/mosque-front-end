@@ -28,7 +28,9 @@ const Search = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/search");
+      const res = await axios.get(
+        "https://mosque-back-end.onrender.com/api/search"
+      );
       setUsers(res.data);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -82,7 +84,9 @@ const Search = () => {
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
     try {
-      await axios.delete(`http://localhost:3000/api/users/${id}`);
+      await axios.delete(
+        `https://mosque-back-end.onrender.com/api/users/${id}`
+      );
       setUsers(users.filter((user) => user._id !== id));
     } catch (error) {
       console.error("Delete error:", error);
@@ -116,7 +120,7 @@ const Search = () => {
 
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/users/${selectedUser._id}`,
+        `https://mosque-back-end.onrender.com/api/users/${selectedUser._id}`,
         {
           [updatedField]: updatedValue,
         }

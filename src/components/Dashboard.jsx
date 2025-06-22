@@ -25,7 +25,9 @@ const Dashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/users");
+      const res = await axios.get(
+        "https://mosque-back-end.onrender.com/api/users"
+      );
       setUsers(res.data);
     } catch (error) {
       console.error("Fetch error:", error);
@@ -39,7 +41,9 @@ const Dashboard = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/users/${id}`);
+      await axios.delete(
+        `https://mosque-back-end.onrender.com/api/users/${id}`
+      );
       setUsers((prev) => prev.filter((user) => user._id !== id));
       toast.success("🎉 Record Deleted");
     } catch (err) {
@@ -59,7 +63,7 @@ const Dashboard = () => {
   const handleUpdateSubmit = async () => {
     try {
       const res = await axios.put(
-        `http://localhost:3000/api/users/${editUser._id}`,
+        `https://mosque-back-end.onrender.com/api/users/${editUser._id}`,
         editUser
       );
       setUsers((prev) =>
@@ -105,7 +109,9 @@ const Dashboard = () => {
 
   const fetchAdmins = async () => {
     try {
-      const res = await axios.get("http://localhost:3000/api/fixed-users");
+      const res = await axios.get(
+        "https://mosque-back-end.onrender.com/api/fixed-users"
+      );
       setAdmins(res.data);
     } catch (err) {
       console.error("Error fetching admins:", err);

@@ -100,7 +100,7 @@ const AddNewRecord = () => {
       }
 
       const res = await axios.post(
-        "http://localhost:3000/api/add-user",
+        "https://mosque-back-end.onrender.com/api/add-user",
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -146,7 +146,7 @@ const AddNewRecord = () => {
       }
 
       const res = await axios.post(
-        "http://localhost:3000/api/add-user",
+        "https://mosque-back-end.onrender.com/api/add-user",
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },

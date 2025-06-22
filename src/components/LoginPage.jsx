@@ -20,7 +20,7 @@ const LoginPage = () => {
     try {
       // ✅ Step 1: Try Admin Login
       const userRes = await axios.post(
-        "http://localhost:3000/api/admin/login", // Assuming you have a login endpoint for users
+        "https://mosque-back-end.onrender.com/api/admin/login", // Assuming you have a login endpoint for users
         {
           number,
           password,
@@ -42,12 +42,12 @@ const LoginPage = () => {
       navigate("/dashboard/dashboardwelcome");
     } catch (userErr) {
       console.log("User login failed, checking fixed user...");
-      console.log(userErr)
+      console.log(userErr);
 
       try {
         // ❌ Step 2: If user login failed, try fixed user login
         const fixedUserRes = await axios.post(
-          "http://localhost:3000/api/fixed-users/login",
+          "https://mosque-back-end.onrender.com/api/fixed-users/login",
           {
             number,
             password,

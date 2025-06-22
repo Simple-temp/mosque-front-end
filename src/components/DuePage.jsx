@@ -20,7 +20,9 @@ const DuePage = () => {
   useEffect(() => {
     const fetchDueUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/due");
+        const res = await axios.get(
+          "https://mosque-back-end.onrender.com/api/due"
+        );
         setUsers(res.data);
       } catch (err) {
         console.error("Error fetching due users:", err);
@@ -34,7 +36,7 @@ const DuePage = () => {
     if (!window.confirm("Are you sure you want to delete this user?")) return;
 
     try {
-      await axios.delete(`http://localhost:3000/api/due/${id}`);
+      await axios.delete(`https://mosque-back-end.onrender.com/api/due/${id}`);
       toast.success("User deleted successfully");
       setUsers((prev) => prev.filter((u) => u._id !== id));
     } catch (error) {
@@ -103,9 +105,7 @@ const DuePage = () => {
                           color: "white",
                           ":hover": { backgroundColor: "#42a5f5" },
                         }}
-                        onClick={() =>
-                          alert(`Message sent to ${user.number}`)
-                        }
+                        onClick={() => alert(`Message sent to ${user.number}`)}
                       >
                         Send
                       </Button>
