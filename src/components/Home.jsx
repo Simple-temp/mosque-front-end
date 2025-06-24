@@ -9,6 +9,7 @@ import GroupRemoveIcon from "@mui/icons-material/GroupRemove";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import WorkHistoryIcon from "@mui/icons-material/WorkHistory";
+import AddTaskIcon from "@mui/icons-material/AddTask";
 
 const Home = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -67,13 +68,13 @@ const Home = () => {
                 </Link>
               </li>
               <li>
-                <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
-                  <AssignmentIndIcon /> Collectors
+                <Link to="dueamount" onClick={() => setSidebarOpen(false)}>
+                  <GroupRemoveIcon /> Due Amount
                 </Link>
               </li>
               <li>
-                <Link to="dueamount" onClick={() => setSidebarOpen(false)}>
-                  <GroupRemoveIcon /> Due Amount
+                <Link to="approval" onClick={() => setSidebarOpen(false)}>
+                  <AddTaskIcon /> Approval list
                 </Link>
               </li>
             </>
@@ -81,6 +82,11 @@ const Home = () => {
           <li>
             <Link to="addnewrecord" onClick={() => setSidebarOpen(false)}>
               <AddCircleIcon /> Add New Record
+            </Link>
+          </li>
+          <li>
+            <Link to="fixedamout" onClick={() => setSidebarOpen(false)}>
+              <AssignmentIndIcon /> Collectors
             </Link>
           </li>
           <li>

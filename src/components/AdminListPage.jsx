@@ -99,7 +99,7 @@ const AdminListPage = () => {
     try {
       await axios.put(
         `https://mosque-back-end.onrender.com/api/admin/${currentId}`,
-        dataToSend,
+        dataToSend
       );
       fetchAdmins();
       handleClose();

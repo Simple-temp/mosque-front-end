@@ -15,6 +15,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import MyAccount from "./components/MyAccount";
 import MyHistoray from "./components/MyHistoray";
 import DashBoardWelcomePage from "./components/DashBoardWelcomePage";
+import AdminAppruval from "./components/AdminAppruval";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
               <Route path="individualsearch" element={<IndividualSearch />} />
               <Route path="adminlist" element={<AdminListPage />} />
               <Route path="fixedamout" element={<FixedAmountPage />} />
+              <Route path="approval" element={<AdminAppruval />} />
               <Route path="dashboardoverview" element={<Dashboard />} />
               <Route path="dueamount" element={<DuePage />} />
             </Route>

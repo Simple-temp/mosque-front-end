@@ -169,6 +169,64 @@ const FixedAmountPage = () => {
     setOpen(true);
   };
 
+  const [clearStatus, setClearStatus] = useState({});
+
+  const handleClear = async (user) => {
+    try {
+      const res = await axios.get(
+        "https://mosque-back-end.onrender.com/api/users"
+      );
+      const allCollections = res.data;
+
+      const userCollections = allCollections.filter(
+        (entry) => entry.submittedByFixedUser === user._id
+      );
+
+      const hasPending = userCollections.some(
+        (entry) => entry.isApproved === false
+      );
+
+      const postPayload = {
+        name: user.name,
+        email: user.email,
+        number: user.number,
+        role: user.role,
+        totalAmount: user.totalCollection,
+        submittedByFixedUser: user._id,
+      };
+
+      // ✅ Save the collection (regardless of pending/approved)
+      await axios.post(
+        "https://mosque-back-end.onrender.com/api/fixed-user-collections",
+        postPayload
+      );
+
+      // ✅ Set status
+      setClearStatus((prev) => ({
+        ...prev,
+        [user._id]: hasPending ? "Pending" : "Approved",
+      }));
+
+      // ✅ Set totalCollection to 0 in UI
+      setUsers((prevUsers) =>
+        prevUsers.map((u) =>
+          u._id === user._id
+            ? { ...u, totalCollection: 0, collectionCount: 0 }
+            : u
+        )
+      );
+
+      toast.success(
+        `Collection ${
+          hasPending ? "marked as Pending" : "Approved"
+        } and cleared!`
+      );
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to clear collection");
+    }
+  };
+
   return (
     <Box sx={{ padding: 4 }}>
       <ToastContainer position="top-right" autoClose={2000} />
@@ -199,7 +257,8 @@ const FixedAmountPage = () => {
                 <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
                   Total Collection
                 </TableCell>
-                <TableCell sx={{ backgroundColor: "#fff9c4" }}>Count</TableCell>
+                <TableCell sx={{ backgroundColor: "#e8f5e9" }}>Count</TableCell>
+                <TableCell sx={{ backgroundColor: "#fff9c4" }}>Clear</TableCell>
                 <TableCell sx={{ backgroundColor: "#ffcdd2" }}>
                   Delete
                 </TableCell>
@@ -226,6 +285,20 @@ const FixedAmountPage = () => {
                   <TableCell sx={{ backgroundColor: "#e8f5e9" }}>
                     {user.collectionCount}
                   </TableCell>
+                  <TableCell sx={{ backgroundColor: "#c8e6c9" }}>
+                    <Button
+                      size="small"
+                      sx={{
+                        backgroundColor: "#42a5f5",
+                        color: "white",
+                        ":hover": { backgroundColor: "#1e88e5" },
+                      }}
+                      onClick={() => handleClear(user)}
+                    >
+                      {clearStatus[user._id] || "Clear"}
+                    </Button>
+                  </TableCell>
+
                   <TableCell>
                     <Button
                       size="small"

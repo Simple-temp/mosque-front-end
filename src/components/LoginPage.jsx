@@ -23,7 +23,7 @@ const LoginPage = () => {
         {
           number,
           password,
-        },
+        }
       );
 
       const user = userRes.data.user;
@@ -47,7 +47,7 @@ const LoginPage = () => {
           {
             number,
             password,
-          },
+          }
         );
 
         const fixedUser = fixedUserRes.data.user;
