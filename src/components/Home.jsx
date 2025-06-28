@@ -73,15 +73,20 @@ const Home = () => {
                 </Link>
               </li>
               <li>
-                <Link to="approval" onClick={() => setSidebarOpen(false)}>
+                <Link to="approval" onClick={() => setSidebarOpen(false)}> 
                   <AddTaskIcon /> Approval list
+                </Link>
+              </li>
+              <li>
+                <Link to="fixeduserList" onClick={() => setSidebarOpen(false)}>
+                  <AddCircleIcon /> Fixed User
                 </Link>
               </li>
             </>
           )}
           <li>
             <Link to="addnewrecord" onClick={() => setSidebarOpen(false)}>
-              <AddCircleIcon /> Add New Record
+              <AddCircleIcon /> Doner
             </Link>
           </li>
           <li>

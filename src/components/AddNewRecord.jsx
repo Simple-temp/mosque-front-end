@@ -31,18 +31,18 @@ const AddNewRecord = () => {
   });
 
   // Special User State
-  const [specialUser, setSpecialUser] = useState({
-    name: "",
-    address: "",
-    number: "",
-    paidAmount: "",
-    email: "",
-    fixedAmount: "",
-    role: "",
-  });
+  // const [specialUser, setSpecialUser] = useState({
+  //   name: "",
+  //   address: "",
+  //   number: "",
+  //   paidAmount: "",
+  //   email: "",
+  //   fixedAmount: "",
+  //   role: "",
+  // });
 
   const [numberMessage, setNumberMessage] = useState("");
-  const [numberMessageSpecial, setNumberMessageSpecial] = useState("");
+  // const [numberMessageSpecial, setNumberMessageSpecial] = useState("");
 
   const handleNormalChange = (field) => (e) => {
     const value = e.target.value;
@@ -62,23 +62,23 @@ const AddNewRecord = () => {
     }
   };
 
-  const handleSpecialChange = (field) => (e) => {
-    const value = e.target.value;
+  // const handleSpecialChange = (field) => (e) => {
+  //   const value = e.target.value;
 
-    setSpecialUser((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+  //   setSpecialUser((prev) => ({
+  //     ...prev,
+  //     [field]: value,
+  //   }));
 
-    if (field === "number") {
-      const numberRegex = /^01[2-9]\d{8}$/;
-      if (value.length === 11 && numberRegex.test(value)) {
-        setNumberMessageSpecial("✅ Number complete");
-      } else {
-        setNumberMessageSpecial("");
-      }
-    }
-  };
+  //   if (field === "number") {
+  //     const numberRegex = /^01[2-9]\d{8}$/;
+  //     if (value.length === 11 && numberRegex.test(value)) {
+  //       setNumberMessageSpecial("✅ Number complete");
+  //     } else {
+  //       setNumberMessageSpecial("");
+  //     }
+  //   }
+  // };
 
   const handleSubmitNormal = async () => {
     try {
@@ -127,53 +127,53 @@ const AddNewRecord = () => {
     }
   };
 
-  const handleSubmitSpecial = async () => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      const userType = JSON.parse(localStorage.getItem("adminUser"));
-      const adminData = JSON.parse(localStorage.getItem("adminUser"));
-      const adminId = adminData?._id;
+  // const handleSubmitSpecial = async () => {
+  //   try {
+  //     const token = localStorage.getItem("adminToken");
+  //     const userType = JSON.parse(localStorage.getItem("adminUser"));
+  //     const adminData = JSON.parse(localStorage.getItem("adminUser"));
+  //     const adminId = adminData?._id;
 
-      const payload = {
-        ...specialUser,
-        userType: "special",
-      };
+  //     const payload = {
+  //       ...specialUser,
+  //       userType: "special",
+  //     };
 
-      if (userType?.role === "admin") {
-        payload.submittedByAdmin = adminId;
-      } else if (userType?.role === "fixed") {
-        payload.submittedByFixedUser = adminId;
-      }
+  //     if (userType?.role === "admin") {
+  //       payload.submittedByAdmin = adminId;
+  //     } else if (userType?.role === "fixed") {
+  //       payload.submittedByFixedUser = adminId;
+  //     }
 
-      const res = await axios.post(
-        "https://mosque-back-end.onrender.com/api/add-user",
-        payload,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+  //     const res = await axios.post(
+  //       "https://mosque-back-end.onrender.com/api/add-user",
+  //       payload,
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
 
-      console.log(res);
+  //     console.log(res);
 
-      toast.success("🎊 Special user registered!");
-      setSpecialUser({
-        name: "",
-        address: "",
-        number: "",
-        paidAmount: "",
-        email: "",
-        fixedAmount: "",
-        role: "",
-      });
-    } catch (error) {
-      if (error.response?.status === 409) {
-        toast.error("⚠️ Number or email already exists!");
-      } else {
-        toast.error("❌ Failed to register special user!");
-      }
-      console.error(error);
-    }
-  };
+  //     toast.success("🎊 Special user registered!");
+  //     setSpecialUser({
+  //       name: "",
+  //       address: "",
+  //       number: "",
+  //       paidAmount: "",
+  //       email: "",
+  //       fixedAmount: "",
+  //       role: "",
+  //     });
+  //   } catch (error) {
+  //     if (error.response?.status === 409) {
+  //       toast.error("⚠️ Number or email already exists!");
+  //     } else {
+  //       toast.error("❌ Failed to register special user!");
+  //     }
+  //     console.error(error);
+  //   }
+  // };
 
   return (
     <Box sx={{ p: 4 }}>
@@ -214,17 +214,17 @@ const AddNewRecord = () => {
           color="success"
           onClick={handleSubmitNormal}
         >
-          Submit Normal User
+          Submit
         </Button>
       </Box>
 
       <Box mt={6} />
 
       {/* 🔸 Special User Form */}
-      <Typography variant="h6" color="#00c853" gutterBottom>
+      {/* <Typography variant="h6" color="#00c853" gutterBottom>
         Special User Registration
-      </Typography>
-      <Grid container spacing={2}>
+      </Typography> */}
+      {/* <Grid container spacing={2}>
         <Grid item xs={12} md={4}>
           <FormControl fullWidth>
             <Select
@@ -263,7 +263,6 @@ const AddNewRecord = () => {
               sx={greenOutline}
               inputProps={field === "number" ? { maxLength: 11 } : {}}
             />
-            {/* ✅ Only show message for number field */}
             {field === "number" && numberMessageSpecial && (
               <Typography
                 variant="body2"
@@ -274,8 +273,8 @@ const AddNewRecord = () => {
             )}
           </Grid>
         ))}
-      </Grid>
-
+      </Grid> */}
+      {/* 
       <Box sx={{ mt: 2 }}>
         <Button
           variant="contained"
@@ -284,7 +283,7 @@ const AddNewRecord = () => {
         >
           Submit Special User
         </Button>
-      </Box>
+      </Box> */}
     </Box>
   );
 };

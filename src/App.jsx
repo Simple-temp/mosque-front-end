@@ -16,6 +16,7 @@ import MyAccount from "./components/MyAccount";
 import MyHistoray from "./components/MyHistoray";
 import DashBoardWelcomePage from "./components/DashBoardWelcomePage";
 import AdminAppruval from "./components/AdminAppruval";
+import FixedUserList from "./components/FixedUserList";
 
 function App() {
   return (
@@ -28,7 +29,10 @@ function App() {
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
             <Route path="/dashboard" element={<Home />}>
-              <Route path="dashboardwelcome" element={<DashBoardWelcomePage />} />
+              <Route
+                path="dashboardwelcome"
+                element={<DashBoardWelcomePage />}
+              />
               <Route path="myaccount" element={<MyAccount />} />
               <Route path="mycollection" element={<MyHistoray />} />
               <Route path="addnewrecord" element={<AddNewRecord />} />
@@ -36,6 +40,7 @@ function App() {
               <Route path="individualsearch" element={<IndividualSearch />} />
               <Route path="adminlist" element={<AdminListPage />} />
               <Route path="fixedamout" element={<FixedAmountPage />} />
+              <Route path="fixeduserList" element={<FixedUserList />} />
               <Route path="approval" element={<AdminAppruval />} />
               <Route path="dashboardoverview" element={<Dashboard />} />
               <Route path="dueamount" element={<DuePage />} />
